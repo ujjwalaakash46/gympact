@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
 import 'package:gympact/constants/colors.dart';
-import 'package:gympact/screens/user_home.dart';
-import 'package:gympact/screens/user_notification.dart';
-import 'package:gympact/screens/user_profile.dart';
-import 'package:gympact/screens/user_progress.dart';
+import 'package:gympact/screens/user-screens/user_home.dart';
+import 'package:gympact/screens/user-screens/user_notification.dart';
+import 'package:gympact/screens/user-screens/user_profile.dart';
+import 'package:gympact/screens/user-screens/user_progress.dart';
 
 class BottomBarNav extends StatefulWidget {
   const BottomBarNav({super.key});

@@ -19,7 +19,7 @@ class Pallete {
   static const backgroundColor = Color.fromARGB(255, 32, 32, 32);
   static const onBackgroundColor = Color.fromRGBO(255, 255, 255, 1);
   static const surfaceColor = Color.fromARGB(255, 44, 44, 44);
-  static const onSurfaceColor = Color.fromARGB(255, 34, 34, 34);
+  static const onSurfaceColor = Color.fromARGB(255, 255, 255, 255);
   static const ligthBlack = Color.fromARGB(184, 0, 0, 0);
   static const grayColor = Color.fromRGBO(186, 201, 255, 0.05);
   static const commonBlueColor = Color.fromARGB(255, 34, 142, 237);

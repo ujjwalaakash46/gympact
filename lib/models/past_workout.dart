@@ -7,6 +7,7 @@ class PastWorkout {
   final int id;
   final DateTime dateTime;
   final Workout workout;
+  //percentage conpleted.
   PastWorkout({
     required this.id,
     required this.dateTime,

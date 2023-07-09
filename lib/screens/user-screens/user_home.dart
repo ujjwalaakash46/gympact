@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/constants/colors.dart';
-import 'package:velocity_x/velocity_x.dart';
+import 'package:gympact/constants/enums.dart';
+import 'package:gympact/models/badges.dart';
+import 'package:gympact/models/current_package.dart';
+import 'package:gympact/models/exercise.dart';
+import 'package:gympact/models/package.dart';
+import 'package:gympact/models/user.dart';
+import 'package:gympact/models/workout.dart';
+import 'package:gympact/screens/common/create_workout.dart';
+import 'package:gympact/screens/user-screens/user_attendance.dart';
+import 'package:gympact/screens/user-screens/user_past_workout.dart';
+import 'package:gympact/screens/user-screens/user_workout.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class UserHome extends ConsumerStatefulWidget {
@@ -12,19 +22,160 @@ class UserHome extends ConsumerStatefulWidget {
 }
 
 class _UserHomeState extends ConsumerState<UserHome> {
+  void onTapMarkAttendance() {
+    Navigator.of(context).pushNamed(UserAttendance.userAttendanceRoute);
+  }
+
+  User user = User(
+      id: 12,
+      coin: 1004,
+      level: 5,
+      gymId: 007,
+      name: "Aman Gupta",
+      phone: "123",
+      email: "amangupta@gh",
+      password: "password",
+      badgesList: [
+        Badges(id: 1, name: "best", img: "/img", date: DateTime.now()),
+        Badges(id: 4, name: "best4", img: "/img", date: DateTime.now()),
+        Badges(id: 5, name: "best5", img: "/img", date: DateTime.now()),
+        Badges(id: 6, name: "best6", img: "/img", date: DateTime.now()),
+        Badges(
+            id: 2,
+            name: "best2",
+            img: "/img",
+            date: DateTime.now().add(Duration(days: 70))),
+        Badges(
+            id: 3,
+            name: "best3",
+            img: "/img",
+            date: DateTime.now().add(Duration(days: 30))),
+      ],
+      workoutList: [
+        Workout(
+            id: 21,
+            gymId: "23",
+            name: "Push",
+            discription: "desisis",
+            note: "note sdf",
+            createdDate: DateTime.now(),
+            updatedDate: DateTime.now(),
+            exercises: [
+              Exercise(23, "bell", "note", 3, 12, 10),
+              Exercise(24, "push ups", "note", 3, 20, 0),
+              Exercise(23, "row", "note", 3, 12, 20),
+              Exercise(23, "bench", "note", 3, 12, 20),
+              Exercise(23, "extension", "note", 3, 12, 20),
+            ],
+            durationInMin: 24),
+        Workout(
+            id: 22,
+            gymId: "23",
+            name: "Push2",
+            discription: "desisis",
+            note: "note sdf",
+            createdDate: DateTime.now(),
+            updatedDate: DateTime.now(),
+            exercises: [
+              Exercise(23, "bell", "note", 3, 12, 10),
+              Exercise(24, "push ups", "note", 3, 20, 0),
+              Exercise(23, "row", "note", 3, 12, 20),
+              Exercise(23, "bench", "note", 3, 12, 20),
+              Exercise(23, "extension", "note", 3, 12, 20),
+            ],
+            durationInMin: 24),
+        Workout(
+            id: 23,
+            gymId: "23",
+            name: "Push3",
+            discription: "desisis",
+            note: "note sdf",
+            createdDate: DateTime.now(),
+            updatedDate: DateTime.now(),
+            exercises: [
+              Exercise(23, "bell", "note", 3, 12, 10),
+              Exercise(24, "push ups", "note", 3, 20, 0),
+              Exercise(23, "row", "note", 3, 12, 20),
+              Exercise(23, "bench", "note", 3, 12, 20),
+              Exercise(23, "extension", "note", 3, 12, 20),
+            ],
+            durationInMin: 24),
+        Workout(
+            id: 24,
+            gymId: "23",
+            name: "Push4",
+            discription: "desisis",
+            note: "note sdf",
+            createdDate: DateTime.now(),
+            updatedDate: DateTime.now(),
+            exercises: [
+              Exercise(23, "bell",
+                  "do whatever you want and be grateful for it", 3, 12, 10),
+              Exercise(24, "push ups", "note", 3, 20, 0),
+              Exercise(23, "row", "", 3, 12, 20),
+              Exercise(23, "bench", "", 3, 12, 20),
+              Exercise(23, "extension", "note", 3, 12, 20),
+              Exercise(23, "extension", "note", 3, 12, 20),
+              Exercise(23, "extension", "note", 3, 12, 20),
+              Exercise(23, "extension", "note", 3, 12, 20),
+              Exercise(23, "extension", "note", 3, 12, 20),
+              Exercise(23, "extension", "note", 3, 12, 20),
+              Exercise(23, "extension", "note", 3, 12, 20),
+              Exercise(23, "extension", "note", 3, 12, 20),
+              Exercise(23, "extension", "note", 3, 12, 20),
+            ],
+            durationInMin: 24),
+        Workout(
+            id: 25,
+            gymId: "235",
+            name: "Push5",
+            discription: "desisis",
+            note: "note sdf",
+            createdDate: DateTime.now(),
+            updatedDate: DateTime.now(),
+            exercises: [
+              Exercise(23, "bell", "note", 3, 12, 10),
+              Exercise(24, "push ups", "note", 3, 20, 0),
+              Exercise(23, "row", "note", 3, 12, 20),
+              Exercise(23, "bench", "note", 3, 12, 20),
+              Exercise(23, "extension", "note", 3, 12, 20),
+            ],
+            durationInMin: 24),
+      ],
+      pastWorkoutList: [],
+      diet: null,
+      progress: null,
+      weight: 65,
+      heigth: 165,
+      goal: "To get fitter",
+      currentPackage: CurrentPackage(
+          id: 2,
+          package: Package(
+              id: 1,
+              price: 600,
+              durationInMonths: 3,
+              name: "3 Month Power Plan",
+              benefits: ["rt", "as", "asd"]),
+          startDate: DateTime.now(),
+          endDate: DateTime.now().add(const Duration(days: 90))),
+      dob: DateTime(1999, 8, 1),
+      joinOn: DateTime.now(),
+      lastVisit: DateTime.now(),
+      progressList: [],
+      role: Role.user);
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
 
-    var workoutList = [
-      {"name": "Push Day", "img": "url", "timeRequired": "45 min"},
-      {"name": "Leg Day", "img": "url", "timeRequired": "45 min"},
-      {"name": "Pull Day", "img": "url", "timeRequired": "45 min"},
-      {"name": "Warm up", "img": "url", "timeRequired": "10 min"},
-      {"name": "Push Day", "img": "url", "timeRequired": "60 min"},
-    ];
-    print(3);
+    // var workoutList = [
+    //   {"name": "Push Day", "img": "url", "timeRequired": "45 min"},
+    //   {"name": "Leg Day", "img": "url", "timeRequired": "45 min"},
+    //   {"name": "Pull Day", "img": "url", "timeRequired": "45 min"},
+    //   {"name": "Warm up", "img": "url", "timeRequired": "10 min"},
+    //   {"name": "Push Day", "img": "url", "timeRequired": "60 min"},
+    // ];
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.all(8.0),
@@ -44,7 +195,8 @@ class _UserHomeState extends ConsumerState<UserHome> {
                   children: [
                     "Hello ".text.color(Pallete.secondaryColor).size(26).make(),
                     // '${user.name},'
-                    'Aman'
+                    user.name
+                        .split(" ")[0]
                         .text
                         .color(Pallete.secondaryColor)
                         .fontWeight(FontWeight.w700)
@@ -108,7 +260,7 @@ class _UserHomeState extends ConsumerState<UserHome> {
                   .makeCentered(),
               HStack(
                 [
-                  "Make Attendance"
+                  "Mark Attendance"
                       .text
                       .color(Pallete.backgroundColor)
                       .size(16)
@@ -134,6 +286,7 @@ class _UserHomeState extends ConsumerState<UserHome> {
                   .width(width * 0.75)
                   .makeCentered()
                   .onTap(() {
+                onTapMarkAttendance();
                 // VxToast.show(context, msg: "Hello from vx");
                 // print(DateTime.now().day);
               }),
@@ -174,6 +327,10 @@ class _UserHomeState extends ConsumerState<UserHome> {
                                 width: 0.8,
                               )
                               .make()
+                              .onInkTap(() {
+                            Navigator.of(context).pushNamed(
+                                UserPastWorkout.userPastWorkoutRoute);
+                          })
                         ],
                       ),
                     ),
@@ -187,7 +344,7 @@ class _UserHomeState extends ConsumerState<UserHome> {
                     SizedBox(
                       height: height * 0.02,
                     ),
-                    ...workoutList.map((e) {
+                    ...user.workoutList.mapIndexed((workout, i) {
                       return Container(
                         decoration: BoxDecoration(
                             color: Pallete.backgroundColor,
@@ -201,7 +358,7 @@ class _UserHomeState extends ConsumerState<UserHome> {
                           // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Container(
-                              child: (e["name"] ?? "").text.size(14).make(),
+                              child: (workout.name).text.size(14).make(),
                             ),
                             SizedBox(
                               height: height * 0.02,
@@ -214,14 +371,18 @@ class _UserHomeState extends ConsumerState<UserHome> {
                                         width: 2, color: Pallete.primaryColor),
                                   ),
                                 ),
-                                child: (e["timeRequired"] ?? "")
+                                child: (workout.durationInMin)
                                     .text
                                     .color(Pallete.whiteDarkColor)
                                     .size(12)
                                     .make()),
                           ],
                         ),
-                      );
+                      ).onInkTap(() {
+                        Navigator.pushNamed(
+                            context, UserWorkout.userWorkoutRoute,
+                            arguments: workout);
+                      });
                     }).toList(),
                     Container(
                       margin: const EdgeInsets.only(top: 18, bottom: 6),
@@ -251,7 +412,13 @@ class _UserHomeState extends ConsumerState<UserHome> {
                           child: "Add New Workout"
                               .text
                               .color(Pallete.primaryFade2)
-                              .makeCentered()),
+                              .makeCentered()
+                              .box
+                              .make()
+                              .onInkTap(() {
+                        Navigator.of(context)
+                            .pushNamed(CreateWorkout.createWorkoutRoute);
+                      })),
                     )
                   ],
                 ),

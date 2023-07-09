@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/common/widgets/bottom_bar_nav.dart';
-import 'package:gympact/screens/user_setting.dart';
+import 'package:gympact/screens/common/add_todays_details.dart';
+import 'package:gympact/screens/common/create_workout.dart';
+import 'package:gympact/screens/common/diet_plan.dart';
+import 'package:gympact/screens/user-screens/user_attendance.dart';
+import 'package:gympact/screens/user-screens/user_past_workout.dart';
+import 'package:gympact/screens/user-screens/user_setting.dart';
+import 'package:gympact/screens/user-screens/user_workout.dart';
 
 import 'constants/colors.dart';
 
@@ -24,6 +30,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Gympact',
       theme: ThemeData(
         fontFamily: "MontserratMedium",
@@ -42,7 +49,15 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
       home: const MyHomePage(),
-      routes: {UserSetting.userSettingRoute: (context) => UserSetting()},
+      routes: {
+        UserSetting.userSettingRoute: (context) => UserSetting(),
+        UserAttendance.userAttendanceRoute: (context) => UserAttendance(),
+        UserWorkout.userWorkoutRoute: (context) => UserWorkout(),
+        CreateWorkout.createWorkoutRoute: (context) => CreateWorkout(),
+        UserPastWorkout.userPastWorkoutRoute: (context) => UserPastWorkout(),
+        DietPlan.dietPlanRoute: (context) => DietPlan(),
+        AddTodaysDetails.addTodaysDetailsRoute: (context) => AddTodaysDetails(),
+      },
     );
   }
 }

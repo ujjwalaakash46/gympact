@@ -11,9 +11,11 @@ class Workout {
   final String name;
   final String discription;
   final String note;
+  final int durationInMin;
   final DateTime createdDate;
   final DateTime updatedDate;
   final List<Exercise> exercises;
+  //added by user
 
   Workout({
     required this.id,
@@ -21,6 +23,7 @@ class Workout {
     required this.name,
     required this.discription,
     required this.note,
+    required this.durationInMin,
     required this.createdDate,
     required this.updatedDate,
     required this.exercises,
@@ -32,6 +35,7 @@ class Workout {
     String? name,
     String? discription,
     String? note,
+    int? durationInMin,
     DateTime? createdDate,
     DateTime? updatedDate,
     List<Exercise>? exercises,
@@ -42,6 +46,7 @@ class Workout {
       name: name ?? this.name,
       discription: discription ?? this.discription,
       note: note ?? this.note,
+      durationInMin: durationInMin ?? this.durationInMin,
       createdDate: createdDate ?? this.createdDate,
       updatedDate: updatedDate ?? this.updatedDate,
       exercises: exercises ?? this.exercises,
@@ -55,6 +60,7 @@ class Workout {
       'name': name,
       'discription': discription,
       'note': note,
+      'durationInMin': durationInMin,
       'createdDate': createdDate.millisecondsSinceEpoch,
       'updatedDate': updatedDate.millisecondsSinceEpoch,
       'exercises': exercises.map((x) => x.toMap()).toList(),
@@ -68,6 +74,7 @@ class Workout {
       name: map['name'] as String,
       discription: map['discription'] as String,
       note: map['note'] as String,
+      durationInMin: map['durationInMin'] as int,
       createdDate:
           DateTime.fromMillisecondsSinceEpoch(map['createdDate'] as int),
       updatedDate:
@@ -87,7 +94,7 @@ class Workout {
 
   @override
   String toString() {
-    return 'Workout(id: $id, gymId: $gymId, name: $name, discription: $discription, note: $note, createdDate: $createdDate, updatedDate: $updatedDate, exercises: $exercises)';
+    return 'Workout(id: $id, gymId: $gymId, name: $name, discription: $discription, note: $note, durationInMin: $durationInMin, createdDate: $createdDate, updatedDate: $updatedDate, exercises: $exercises)';
   }
 
   @override
@@ -99,6 +106,7 @@ class Workout {
         other.name == name &&
         other.discription == discription &&
         other.note == note &&
+        other.durationInMin == durationInMin &&
         other.createdDate == createdDate &&
         other.updatedDate == updatedDate &&
         listEquals(other.exercises, exercises);
@@ -111,6 +119,7 @@ class Workout {
         name.hashCode ^
         discription.hashCode ^
         note.hashCode ^
+        durationInMin.hashCode ^
         createdDate.hashCode ^
         updatedDate.hashCode ^
         exercises.hashCode;

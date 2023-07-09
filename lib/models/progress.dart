@@ -1,55 +1,60 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
-
-import 'package:gympact/models/sub-progress/fat.dart';
-import 'package:gympact/models/sub-progress/weight.dart';
-
 class Progress {
   final int id;
-  final List<Weight> weightList;
-  final List<Fat> fatList;
+  final DateTime dateTime;
+  final double weight;
+  final double fat;
+  final double calBurn;
+  final double waterIntake;
 
   Progress({
     required this.id,
-    required this.weightList,
-    required this.fatList,
+    required this.dateTime,
+    required this.weight,
+    required this.fat,
+    required this.calBurn,
+    required this.waterIntake,
   });
 
   Progress copyWith({
     int? id,
-    List<Weight>? weightList,
-    List<Fat>? fatList,
+    DateTime? dateTime,
+    double? weight,
+    double? fat,
+    double? calBurn,
+    double? waterIntake,
   }) {
     return Progress(
       id: id ?? this.id,
-      weightList: weightList ?? this.weightList,
-      fatList: fatList ?? this.fatList,
+      dateTime: dateTime ?? this.dateTime,
+      weight: weight ?? this.weight,
+      fat: fat ?? this.fat,
+      calBurn: calBurn ?? this.calBurn,
+      waterIntake: waterIntake ?? this.waterIntake,
     );
   }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'weightList': weightList.map((x) => x.toMap()).toList(),
-      'fatList': fatList.map((x) => x.toMap()).toList(),
+      'dateTime': dateTime.millisecondsSinceEpoch,
+      'weight': weight,
+      'fat': fat,
+      'calBurn': calBurn,
+      'waterIntake': waterIntake,
     };
   }
 
   factory Progress.fromMap(Map<String, dynamic> map) {
     return Progress(
       id: map['id'] as int,
-      weightList: List<Weight>.from(
-        (map['weightList'] as List<int>).map<Weight>(
-          (x) => Weight.fromMap(x as Map<String, dynamic>),
-        ),
-      ),
-      fatList: List<Fat>.from(
-        (map['fatList'] as List<int>).map<Fat>(
-          (x) => Fat.fromMap(x as Map<String, dynamic>),
-        ),
-      ),
+      dateTime: DateTime.fromMillisecondsSinceEpoch(map['dateTime'] as int),
+      weight: map['weight'] as double,
+      fat: map['fat'] as double,
+      calBurn: map['calBurn'] as double,
+      waterIntake: map['waterIntake'] as double,
     );
   }
 
@@ -59,18 +64,29 @@ class Progress {
       Progress.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() =>
-      'Progress(id: $id, weightList: $weightList, fatList: $fatList)';
+  String toString() {
+    return 'Progress(id: $id, dateTime: $dateTime, weight: $weight, fat: $fat, calBurn: $calBurn, waterIntake: $waterIntake)';
+  }
 
   @override
   bool operator ==(covariant Progress other) {
     if (identical(this, other)) return true;
 
     return other.id == id &&
-        listEquals(other.weightList, weightList) &&
-        listEquals(other.fatList, fatList);
+        other.dateTime == dateTime &&
+        other.weight == weight &&
+        other.fat == fat &&
+        other.calBurn == calBurn &&
+        other.waterIntake == waterIntake;
   }
 
   @override
-  int get hashCode => id.hashCode ^ weightList.hashCode ^ fatList.hashCode;
+  int get hashCode {
+    return id.hashCode ^
+        dateTime.hashCode ^
+        weight.hashCode ^
+        fat.hashCode ^
+        calBurn.hashCode ^
+        waterIntake.hashCode;
+  }
 }

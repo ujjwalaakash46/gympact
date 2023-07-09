@@ -40,12 +40,16 @@ dependencies:
   shared_preferences: ^2.1.2
   google_fonts: ^4.0.4
   intl: ^0.17.0
-  qr_code_scanner: ^1.0.1
   fluttertoast: ^8.0.9
-  qr_flutter: ^4.0.0
   flutter_snake_navigationbar: ^0.6.1
-  velocity_x: 3.6.0
+  velocity_x: any
   time_machine: ^0.9.17
+  loading_indicator: ^3.1.1
+  mobile_scanner: ^3.3.0
+  table_calendar: any
+  percent_indicator: ^4.2.3
+  fl_chart: ^0.63.0
+  d_chart: ^2.3.0
 
 dev_dependencies:
   flutter_test:

@@ -26,6 +26,7 @@ class User {
   final List<Badges> badgesList;
   final List<Workout> workoutList;
   final List<PastWorkout> pastWorkoutList;
+  final List<Progress> progressList;
   final Diet? diet;
   final Progress? progress;
   final CurrentPackage currentPackage;
@@ -49,6 +50,7 @@ class User {
     required this.badgesList,
     required this.workoutList,
     required this.pastWorkoutList,
+    required this.progressList,
     this.diet,
     this.progress,
     required this.currentPackage,
@@ -73,6 +75,7 @@ class User {
     List<Badges>? badgesList,
     List<Workout>? workoutList,
     List<PastWorkout>? pastWorkoutList,
+    List<Progress>? progressList,
     Diet? diet,
     Progress? progress,
     CurrentPackage? currentPackage,
@@ -96,6 +99,7 @@ class User {
       badgesList: badgesList ?? this.badgesList,
       workoutList: workoutList ?? this.workoutList,
       pastWorkoutList: pastWorkoutList ?? this.pastWorkoutList,
+      progressList: progressList ?? this.progressList,
       diet: diet ?? this.diet,
       progress: progress ?? this.progress,
       currentPackage: currentPackage ?? this.currentPackage,
@@ -122,6 +126,7 @@ class User {
       'badgesList': badgesList.map((x) => x.toMap()).toList(),
       'workoutList': workoutList.map((x) => x.toMap()).toList(),
       'pastWorkoutList': pastWorkoutList.map((x) => x.toMap()).toList(),
+      'progressList': progressList.map((x) => x.toMap()).toList(),
       'diet': diet?.toMap(),
       'progress': progress?.toMap(),
       'currentPackage': currentPackage.toMap(),
@@ -160,6 +165,11 @@ class User {
           (x) => PastWorkout.fromMap(x as Map<String, dynamic>),
         ),
       ),
+      progressList: List<Progress>.from(
+        (map['progressList'] as List<int>).map<Progress>(
+          (x) => Progress.fromMap(x as Map<String, dynamic>),
+        ),
+      ),
       diet: map['diet'] != null
           ? Diet.fromMap(map['diet'] as Map<String, dynamic>)
           : null,
@@ -182,7 +192,7 @@ class User {
 
   @override
   String toString() {
-    return 'User(id: $id, coin: $coin, level: $level, gymId: $gymId, weight: $weight, heigth: $heigth, name: $name, phone: $phone, email: $email, password: $password, goal: $goal, badgesList: $badgesList, workoutList: $workoutList, pastWorkoutList: $pastWorkoutList, diet: $diet, progress: $progress, currentPackage: $currentPackage, dob: $dob, joinOn: $joinOn, lastVisit: $lastVisit, role: $role)';
+    return 'User(id: $id, coin: $coin, level: $level, gymId: $gymId, weight: $weight, heigth: $heigth, name: $name, phone: $phone, email: $email, password: $password, goal: $goal, badgesList: $badgesList, workoutList: $workoutList, pastWorkoutList: $pastWorkoutList, progressList: $progressList, diet: $diet, progress: $progress, currentPackage: $currentPackage, dob: $dob, joinOn: $joinOn, lastVisit: $lastVisit, role: $role)';
   }
 
   @override
@@ -203,6 +213,7 @@ class User {
         listEquals(other.badgesList, badgesList) &&
         listEquals(other.workoutList, workoutList) &&
         listEquals(other.pastWorkoutList, pastWorkoutList) &&
+        listEquals(other.progressList, progressList) &&
         other.diet == diet &&
         other.progress == progress &&
         other.currentPackage == currentPackage &&
@@ -228,6 +239,7 @@ class User {
         badgesList.hashCode ^
         workoutList.hashCode ^
         pastWorkoutList.hashCode ^
+        progressList.hashCode ^
         diet.hashCode ^
         progress.hashCode ^
         currentPackage.hashCode ^

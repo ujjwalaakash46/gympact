@@ -5,26 +5,26 @@ class Diet {
   final int id;
   final String name;
   final String note;
-  final String protine;
-  final String waterIntake;
-  final String calIntake;
-  final String calToBurn;
+  final double protine;
+  final String? waterIntake;
+  final String? calIntake;
+  final String? calToBurn;
 
   Diet({
     required this.id,
     required this.name,
     required this.note,
     required this.protine,
-    required this.waterIntake,
-    required this.calIntake,
-    required this.calToBurn,
+    this.waterIntake,
+    this.calIntake,
+    this.calToBurn,
   });
 
   Diet copyWith({
     int? id,
     String? name,
     String? note,
-    String? protine,
+    double? protine,
     String? waterIntake,
     String? calIntake,
     String? calToBurn,
@@ -57,10 +57,11 @@ class Diet {
       id: map['id'] as int,
       name: map['name'] as String,
       note: map['note'] as String,
-      protine: map['protine'] as String,
-      waterIntake: map['waterIntake'] as String,
-      calIntake: map['calIntake'] as String,
-      calToBurn: map['calToBurn'] as String,
+      protine: map['protine'] as double,
+      waterIntake:
+          map['waterIntake'] != null ? map['waterIntake'] as String : null,
+      calIntake: map['calIntake'] != null ? map['calIntake'] as String : null,
+      calToBurn: map['calToBurn'] != null ? map['calToBurn'] as String : null,
     );
   }
 

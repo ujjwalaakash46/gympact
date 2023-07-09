@@ -153,6 +153,8 @@ class _UserNotificationState extends ConsumerState<UserNotification> {
                         style: const TextStyle(fontSize: 16),
                       ),
                     ),
+
+                    //cahnge map to mapIndexed()
                     ...streakList
                         .getRange(0, showAllStreakList ? streakList.length : 5)
                         .map((e) {

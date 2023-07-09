@@ -7,7 +7,7 @@ import 'package:gympact/models/badges.dart';
 import 'package:gympact/models/current_package.dart';
 import 'package:gympact/models/package.dart';
 import 'package:gympact/models/user.dart';
-import 'package:gympact/screens/user_setting.dart';
+import 'package:gympact/screens/user-screens/user_setting.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class UserProfile extends ConsumerStatefulWidget {
@@ -45,6 +45,7 @@ class _UserProfileState extends ConsumerState<UserProfile> {
       ],
       workoutList: [],
       pastWorkoutList: [],
+      progressList: [],
       diet: null,
       progress: null,
       weight: 65,

@@ -19,6 +19,15 @@ class _UserSettingState extends State<UserSetting> {
   // late TextEditingController dobController;
 
   @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    weightController.dispose();
+    heightController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     emailController.text = "sdf";
     passwordController.text = "ssdfdf";

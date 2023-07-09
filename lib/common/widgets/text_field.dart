@@ -3,26 +3,31 @@ import 'package:flutter/material.dart';
 import 'package:gympact/constants/colors.dart';
 
 class InputTextField extends StatelessWidget {
-  const InputTextField({
-    Key? key,
-    required this.label,
-    required this.hint,
-    required this.hide,
-    required this.controller,
-    required this.type,
-  }) : super(key: key);
+  const InputTextField(
+      {Key? key,
+      required this.label,
+      this.hint = "",
+      this.hide = false,
+      this.boardRadius = 25.7,
+      this.fillColor = Pallete.surfaceColor2,
+      required this.controller,
+      required this.type,
+      this.height = 50})
+      : super(key: key);
 
   final String label;
   final String hint;
   final bool hide;
   final TextEditingController controller;
   final TextInputType type;
+  final double height;
+  final double boardRadius;
+  final Color fillColor;
 
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
       Container(
-        height: 50,
         decoration: const BoxDecoration(
           borderRadius: BorderRadius.all(
             Radius.circular(40),
@@ -36,6 +41,7 @@ class InputTextField extends StatelessWidget {
         ),
       ),
       TextField(
+        maxLines: type == TextInputType.multiline ? null : 1,
         obscureText: hide ? true : false,
         enableSuggestions: hide ? false : true,
         keyboardType: type,
@@ -44,16 +50,16 @@ class InputTextField extends StatelessWidget {
           label: Text(label),
           hintText: hint,
           filled: true,
-          fillColor: Pallete.surfaceColor,
-          contentPadding:
-              const EdgeInsets.only(left: 14.0, bottom: 8.0, top: 8.0),
+          fillColor: fillColor,
+          contentPadding: const EdgeInsets.only(
+              left: 14.0, bottom: 8.0, top: 8.0, right: 3),
           focusedBorder: OutlineInputBorder(
-            borderSide: const BorderSide(color: Pallete.surfaceColor2),
-            borderRadius: BorderRadius.circular(25.7),
+            borderSide: BorderSide(color: fillColor),
+            borderRadius: BorderRadius.circular(boardRadius),
           ),
           enabledBorder: UnderlineInputBorder(
-            borderSide: const BorderSide(color: Pallete.surfaceColor2),
-            borderRadius: BorderRadius.circular(25.7),
+            borderSide: BorderSide(color: fillColor),
+            borderRadius: BorderRadius.circular(boardRadius),
           ),
           // labelStyle: TextStyle(color: Colors.amberAccent),
           // fillColor: AppColor().onBackground,
