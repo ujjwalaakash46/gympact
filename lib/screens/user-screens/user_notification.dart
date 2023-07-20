@@ -156,7 +156,11 @@ class _UserNotificationState extends ConsumerState<UserNotification> {
 
                     //cahnge map to mapIndexed()
                     ...streakList
-                        .getRange(0, showAllStreakList ? streakList.length : 5)
+                        .getRange(
+                            0,
+                            showAllStreakList || streakList.length < 5
+                                ? streakList.length
+                                : 5)
                         .map((e) {
                       streakIndex++;
                       return Container(
@@ -242,7 +246,10 @@ class _UserNotificationState extends ConsumerState<UserNotification> {
                     ),
                     ...achieversList
                         .getRange(
-                            0, showAllAchieversList ? achieversList.length : 5)
+                            0,
+                            showAllAchieversList || achieversList.length < 5
+                                ? achieversList.length
+                                : 5)
                         .map((e) {
                       achieverIndex++;
                       return Container(

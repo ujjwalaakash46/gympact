@@ -41,6 +41,7 @@ class _UserProgressState extends ConsumerState<UserProgress> {
   bool isBetter = true;
 
   User user = User(
+      gender: "male",
       id: 12,
       coin: 1004,
       level: 5,
@@ -114,7 +115,7 @@ class _UserProgressState extends ConsumerState<UserProgress> {
       dob: DateTime(1999, 8, 1),
       joinOn: DateTime.now(),
       lastVisit: DateTime.now(),
-      role: Role.user);
+      role: Role.member);
 
   @override
   Widget build(BuildContext context) {

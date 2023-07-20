@@ -27,6 +27,7 @@ class _UserHomeState extends ConsumerState<UserHome> {
   }
 
   User user = User(
+      gender: "male",
       id: 12,
       coin: 1004,
       level: 5,
@@ -162,7 +163,7 @@ class _UserHomeState extends ConsumerState<UserHome> {
       joinOn: DateTime.now(),
       lastVisit: DateTime.now(),
       progressList: [],
-      role: Role.user);
+      role: Role.member);
 
   @override
   Widget build(BuildContext context) {
@@ -371,7 +372,7 @@ class _UserHomeState extends ConsumerState<UserHome> {
                                         width: 2, color: Pallete.primaryColor),
                                   ),
                                 ),
-                                child: (workout.durationInMin)
+                                child: ("${workout.durationInMin} min")
                                     .text
                                     .color(Pallete.whiteDarkColor)
                                     .size(12)

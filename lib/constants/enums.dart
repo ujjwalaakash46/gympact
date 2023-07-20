@@ -1,1 +1,1 @@
-enum Role { user, admin, trainer }
+enum Role { member, admin, trainer }

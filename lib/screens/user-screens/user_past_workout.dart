@@ -23,6 +23,7 @@ class _UserPastWorkoutState extends State<UserPastWorkout> {
   List<Workout> workoutList = [];
 
   User user = User(
+      gender: "male",
       id: 12,
       coin: 1004,
       level: 5,
@@ -96,7 +97,7 @@ class _UserPastWorkoutState extends State<UserPastWorkout> {
       dob: DateTime(1999, 8, 1),
       joinOn: DateTime.now(),
       lastVisit: DateTime.now(),
-      role: Role.user);
+      role: Role.member);
 
   @override
   Widget build(BuildContext context) {

@@ -19,6 +19,7 @@ class User {
   final double weight;
   final double heigth;
   final String name;
+  String? gender;
   final String phone;
   final String email;
   final String password;
@@ -43,6 +44,7 @@ class User {
     required this.weight,
     required this.heigth,
     required this.name,
+    this.gender,
     required this.phone,
     required this.email,
     required this.password,
@@ -68,6 +70,7 @@ class User {
     double? weight,
     double? heigth,
     String? name,
+    String? gender,
     String? phone,
     String? email,
     String? password,
@@ -92,6 +95,7 @@ class User {
       weight: weight ?? this.weight,
       heigth: heigth ?? this.heigth,
       name: name ?? this.name,
+      gender: gender ?? this.gender,
       phone: phone ?? this.phone,
       email: email ?? this.email,
       password: password ?? this.password,
@@ -119,6 +123,7 @@ class User {
       'weight': weight,
       'heigth': heigth,
       'name': name,
+      'gender': gender,
       'phone': phone,
       'email': email,
       'password': password,
@@ -146,6 +151,7 @@ class User {
       weight: map['weight'] as double,
       heigth: map['heigth'] as double,
       name: map['name'] as String,
+      gender: map['gender'] != null ? map['gender'] as String : null,
       phone: map['phone'] as String,
       email: map['email'] as String,
       password: map['password'] as String,
@@ -181,7 +187,7 @@ class User {
       dob: DateTime.fromMillisecondsSinceEpoch(map['dob'] as int),
       joinOn: DateTime.fromMillisecondsSinceEpoch(map['joinOn'] as int),
       lastVisit: DateTime.fromMillisecondsSinceEpoch(map['lastVisit'] as int),
-      role: (map['role'] as Role),
+      role: map['role'] as Role,
     );
   }
 
@@ -192,7 +198,7 @@ class User {
 
   @override
   String toString() {
-    return 'User(id: $id, coin: $coin, level: $level, gymId: $gymId, weight: $weight, heigth: $heigth, name: $name, phone: $phone, email: $email, password: $password, goal: $goal, badgesList: $badgesList, workoutList: $workoutList, pastWorkoutList: $pastWorkoutList, progressList: $progressList, diet: $diet, progress: $progress, currentPackage: $currentPackage, dob: $dob, joinOn: $joinOn, lastVisit: $lastVisit, role: $role)';
+    return 'User(id: $id, coin: $coin, level: $level, gymId: $gymId, weight: $weight, heigth: $heigth, name: $name, gender: $gender, phone: $phone, email: $email, password: $password, goal: $goal, badgesList: $badgesList, workoutList: $workoutList, pastWorkoutList: $pastWorkoutList, progressList: $progressList, diet: $diet, progress: $progress, currentPackage: $currentPackage, dob: $dob, joinOn: $joinOn, lastVisit: $lastVisit, role: $role)';
   }
 
   @override
@@ -206,6 +212,7 @@ class User {
         other.weight == weight &&
         other.heigth == heigth &&
         other.name == name &&
+        other.gender == gender &&
         other.phone == phone &&
         other.email == email &&
         other.password == password &&
@@ -232,6 +239,7 @@ class User {
         weight.hashCode ^
         heigth.hashCode ^
         name.hashCode ^
+        gender.hashCode ^
         phone.hashCode ^
         email.hashCode ^
         password.hashCode ^

@@ -152,6 +152,15 @@ class _AddTodaysDetailsState extends State<AddTodaysDetails> {
   }
 
   @override
+  void dispose() {
+    weightController.dispose();
+    waterInTakeController.dispose();
+    calorieIntakeController.dispose();
+    calorieBurnController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;

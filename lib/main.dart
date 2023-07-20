@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gympact/common/widgets/bottom_bar_nav.dart';
+import 'package:gympact/screens/admin-screens/admin_bottom_bar_nav.dart';
+import 'package:gympact/screens/admin-screens/admin_diets.dart';
+import 'package:gympact/screens/admin-screens/admin_package_list.dart';
+import 'package:gympact/screens/admin-screens/admin_packages.dart';
+import 'package:gympact/screens/admin-screens/admin_user_add.dart';
+import 'package:gympact/screens/admin-screens/admin_workouts.dart';
+import 'package:gympact/screens/admin-screens/admin_birthday.dart';
+import 'package:gympact/screens/login.dart';
 import 'package:gympact/screens/common/add_todays_details.dart';
 import 'package:gympact/screens/common/create_workout.dart';
 import 'package:gympact/screens/common/diet_plan.dart';
 import 'package:gympact/screens/user-screens/user_attendance.dart';
+import 'package:gympact/screens/user-screens/user_bottom_bar_nav.dart';
+import 'package:gympact/screens/user-screens/user_home.dart';
 import 'package:gympact/screens/user-screens/user_past_workout.dart';
 import 'package:gympact/screens/user-screens/user_setting.dart';
 import 'package:gympact/screens/user-screens/user_workout.dart';
@@ -50,6 +59,9 @@ class _MyAppState extends State<MyApp> {
       ),
       home: const MyHomePage(),
       routes: {
+        UserBottomBarNav.userMainScreenRoute: (context) => UserBottomBarNav(),
+        AdminBottomBarNav.adminMainScreenRoute: (context) =>
+            AdminBottomBarNav(),
         UserSetting.userSettingRoute: (context) => UserSetting(),
         UserAttendance.userAttendanceRoute: (context) => UserAttendance(),
         UserWorkout.userWorkoutRoute: (context) => UserWorkout(),
@@ -57,6 +69,12 @@ class _MyAppState extends State<MyApp> {
         UserPastWorkout.userPastWorkoutRoute: (context) => UserPastWorkout(),
         DietPlan.dietPlanRoute: (context) => DietPlan(),
         AddTodaysDetails.addTodaysDetailsRoute: (context) => AddTodaysDetails(),
+        AdminPackages.adminPackagesRoute: (context) => AdminPackages(),
+        AdminPackageList.adminPackageListRoute: (context) => AdminPackageList(),
+        AdminWorkouts.adminWorkoutsRoute: (context) => AdminWorkouts(),
+        AdminDiets.adminDietsRoute: (context) => AdminDiets(),
+        AdminBirthday.adminBirthdayRoute: (context) => AdminBirthday(),
+        AdminUserAdd.adminUserAddRoute: (context) => AdminUserAdd(),
       },
     );
   }
@@ -67,6 +85,6 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BottomBarNav();
+    return AdminBottomBarNav();
   }
 }

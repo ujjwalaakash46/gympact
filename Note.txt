@@ -1,2 +1,4 @@
 for iOS
 scanner :https://www.youtube.com/watch?v=tGSWzsxJCsA&t=149s&ab_channel=BaabaDevs
+
+image picker :https://www.youtube.com/watch?v=IePaAGXzmtU
