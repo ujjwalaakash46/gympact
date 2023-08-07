@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:d_chart/d_chart.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +11,10 @@ import 'package:gympact/models/current_package.dart';
 import 'package:gympact/models/package.dart';
 import 'package:gympact/models/progress.dart';
 import 'package:gympact/models/user.dart';
+import 'package:gympact/provider/user_state.dart';
 import 'package:gympact/screens/common/add_todays_details.dart';
 import 'package:gympact/screens/common/diet_plan.dart';
+import 'package:gympact/service/user_service.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -23,9 +27,6 @@ class UserProgress extends ConsumerStatefulWidget {
 }
 
 class _UserProgressState extends ConsumerState<UserProgress> {
-  int initialWeight = 80;
-  int desiredWeight = 65;
-
   int inWeeks = 3;
   int weekWeight = 3;
   int weekWaterIntake = 0;
@@ -37,6 +38,16 @@ class _UserProgressState extends ConsumerState<UserProgress> {
   bool showwaterIntakeChart = false;
   bool showCalBurnChart = false;
 
+  int initialWeight = 0;
+  int desiredWeight = 0;
+  double goalPercentage = 0;
+  double bmi = 0;
+  String waterIntakeMessage = "-";
+  String fatMessage = "-";
+  String calBurnMessage = "-";
+  String weigthMessage = "-";
+  String goalMessage = "";
+
   //up down
   bool isBetter = true;
 
@@ -45,7 +56,7 @@ class _UserProgressState extends ConsumerState<UserProgress> {
       id: 12,
       coin: 1004,
       level: 5,
-      gymId: 007,
+      gymId: "007",
       name: "Aman Gupta",
       phone: "123",
       email: "amangupta@gh",
@@ -117,16 +128,48 @@ class _UserProgressState extends ConsumerState<UserProgress> {
       lastVisit: DateTime.now(),
       role: Role.member);
 
+  fetchInitialData() async {
+    final userId = ref.read(userProvider)?.id;
+    await ref.read(progressDetailsProvider.notifier).fetchProgress(userId!);
+    print(2);
+    final list =
+        await ref.read(progressListProvider.notifier).fetchProgress(userId);
+    ref.read(userProvider.notifier).updateProgess(list!);
+    print(list);
+  }
+
+  @override
+  void initState() {
+    fetchInitialData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-
-    double goalPercentage =
-        (user.weight - initialWeight) / (desiredWeight - initialWeight);
-    goalPercentage = goalPercentage > 1 ? 1 : goalPercentage;
-    goalPercentage = goalPercentage < 0 ? 0 : goalPercentage;
-    goalPercentage = desiredWeight == initialWeight ? 1 : goalPercentage;
+    user = ref.watch(userProvider)!;
+    print("user");
+    print(user.progressList);
+    final map = ref.watch(progressDetailsProvider);
+    if (map["initialWeight"] != null) {
+      // setState(() {
+      initialWeight = (map["initialWeight"] as double).toInt();
+      desiredWeight = int.parse(map["desiredWeight"]);
+      goalPercentage = double.parse(map["goalPercentage"]);
+      bmi = double.parse(map["bmi"]);
+      waterIntakeMessage = (map["waterIntakeMessage"]);
+      fatMessage = (map["fatMessage"]);
+      calBurnMessage = (map["calBurnMessage"]);
+      weigthMessage = (map["weigthMessage"]);
+      goalMessage = (map["goalMessage"]);
+      // });
+    }
+    // double goalPercentage =
+    //     (user.weight! - initialWeight) / (desiredWeight - initialWeight);
+    // goalPercentage = goalPercentage > 1 ? 1 : goalPercentage;
+    // goalPercentage = goalPercentage < 0 ? 0 : goalPercentage;
+    // goalPercentage = desiredWeight == initialWeight ? 1 : goalPercentage;
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -190,9 +233,7 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                         backgroundColor: Pallete.surfaceColor4,
                       ),
                     ),
-                    (isBetter
-                            ? "Wow Great keep it up\n You are ${(goalPercentage * 100).round()}% closer to your Ideal weigth"
-                            : "")
+                    (goalMessage)
                         .text
                         .align(TextAlign.center)
                         .makeCentered()
@@ -248,6 +289,32 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                 height: height * 0.02,
               ),
               Container(
+                  padding: const EdgeInsets.all(16),
+                  width: width * 0.85,
+                  decoration: BoxDecoration(
+                    color: Pallete.surfaceColor2,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  margin: EdgeInsets.only(bottom: 4, top: 4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      "Current BMI:".text.size(16).make(),
+                      bmi
+                          .toStringAsFixed(1)
+                          .text
+                          .size(16)
+                          .bold
+                          .makeCentered()
+                          .box
+                          .margin(EdgeInsets.only(right: width * 0.1))
+                          .make(),
+                    ],
+                  )),
+              // SizedBox(
+              //   height: 4,
+              // ),
+              Container(
                 padding: const EdgeInsets.all(16),
                 width: width * 0.85,
                 decoration: BoxDecoration(
@@ -268,22 +335,14 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ("${user.progressList[0].weight}kg")
+                        ("${user.progressList![0].weight}kg")
                             .text
                             .size(16)
                             .make(),
-                        weekWeight >= 0
-                            ? ("${weekWeight}kg gain till now")
-                                .text
-                                .size(14)
-                                .color(Pallete.primaryColor)
-                                .make()
-                            : ("${weekWeight}kg loss till now")
-                                // "${weekWeight}kg loss in $inWeeks weeks")
-                                .text
-                                .size(14)
-                                .color(Pallete.primaryColor)
-                                .make(),
+                        weigthMessage.text
+                            .size(14)
+                            .color(Pallete.primaryColor)
+                            .make(),
                       ],
                     ),
                     if (showWeightChart)
@@ -307,9 +366,9 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                                 id: 'Keyboard',
                                 color: Pallete.primaryColor,
                                 data: [
-                                  ...user.progressList.map((e) {
+                                  ...user.progressList!.map((e) {
                                     return DChartTimeData(
-                                        time: e.dateTime, value: e.weight);
+                                        time: e.dateTime, value: e.weight ?? 0);
                                   }).toList(),
                                 ],
                               ),
@@ -370,19 +429,13 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ("${user.progressList[0].fat}%").text.size(16).make(),
-                        weekFat >= 0
-                            ? ("${weekFat}% gain till now")
-                                .text
-                                .size(14)
-                                .color(Pallete.primaryColor)
-                                .make()
-                            : ("${weekFat}% loss till now")
-                                // "${weekWeight}kg loss in $inWeeks weeks")
-                                .text
-                                .size(14)
-                                .color(Pallete.primaryColor)
-                                .make(),
+                        ("${user.progressList![0].fat}%").text.size(16).make(),
+                        fatMessage
+                            // "${weekWeight}kg loss in $inWeeks weeks")
+                            .text
+                            .size(14)
+                            .color(Pallete.primaryColor)
+                            .make(),
                       ],
                     ),
                     if (showfatChart)
@@ -406,9 +459,9 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                                 id: 'Keyboard',
                                 color: Pallete.primaryColor,
                                 data: [
-                                  ...user.progressList.map((e) {
+                                  ...user.progressList!.map((e) {
                                     return DChartTimeData(
-                                        time: e.dateTime, value: e.fat);
+                                        time: e.dateTime, value: e.fat ?? 0);
                                   }).toList(),
                                 ],
                               ),
@@ -469,22 +522,16 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ("${user.progressList[0].weight} cal burn avg")
+                        ("${user.progressList![0].weight} cal burn avg")
                             .text
                             .size(16)
                             .make(),
-                        weekCalBurn >= 0
-                            ? ("${weekCalBurn} cal burn incresed")
-                                .text
-                                .size(14)
-                                .color(Pallete.primaryColor)
-                                .make()
-                            : ("${weekCalBurn} cal burn decreased")
-                                // "${weekWeight}kg loss in $inWeeks weeks")
-                                .text
-                                .size(14)
-                                .color(Pallete.primaryColor)
-                                .make(),
+                        calBurnMessage
+                            // "${weekWeight}kg loss in $inWeeks weeks")
+                            .text
+                            .size(14)
+                            .color(Pallete.primaryColor)
+                            .make(),
                       ],
                     ),
                     if (showCalBurnChart)
@@ -508,9 +555,10 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                                 id: 'Keyboard',
                                 color: Pallete.primaryColor,
                                 data: [
-                                  ...user.progressList.map((e) {
+                                  ...user.progressList!.map((e) {
                                     return DChartTimeData(
-                                        time: e.dateTime, value: e.calBurn);
+                                        time: e.dateTime,
+                                        value: e.calBurn ?? 0);
                                   }).toList(),
                                 ],
                               ),
@@ -571,22 +619,16 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ("${user.progressList[0].waterIntake} L")
+                        ("${user.progressList![0].waterIntake} L")
                             .text
                             .size(16)
                             .make(),
-                        weekWaterIntake >= 0
-                            ? ("${weekWaterIntake}L increased this week")
-                                .text
-                                .size(14)
-                                .color(Pallete.primaryColor)
-                                .make()
-                            : ("${weekWaterIntake}L decresed this week")
-                                // "${weekWeight}kg loss in $inWeeks weeks")
-                                .text
-                                .size(14)
-                                .color(Pallete.primaryColor)
-                                .make(),
+                        waterIntakeMessage
+                            // "${weekWeight}kg loss in $inWeeks weeks")
+                            .text
+                            .size(14)
+                            .color(Pallete.primaryColor)
+                            .make(),
                       ],
                     ),
                     if (showwaterIntakeChart)
@@ -610,9 +652,10 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                                 id: 'Keyboard',
                                 color: Pallete.primaryColor,
                                 data: [
-                                  ...user.progressList.map((e) {
+                                  ...(user.progressList ?? []).map((e) {
                                     return DChartTimeData(
-                                        time: e.dateTime, value: e.waterIntake);
+                                        time: e.dateTime,
+                                        value: e.waterIntake ?? 0);
                                   }).toList(),
                                 ],
                               ),

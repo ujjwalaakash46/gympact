@@ -1,27 +1,76 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/common/widgets/text_field.dart';
 import 'package:gympact/constants/colors.dart';
+import 'package:gympact/provider/user_state.dart';
+import 'package:gympact/service/user_service.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class AddTodaysDetails extends StatefulWidget {
+import '../../models/progress.dart';
+
+class AddTodaysDetails extends ConsumerStatefulWidget {
   static const addTodaysDetailsRoute = "/add-todays-details";
   const AddTodaysDetails({super.key});
 
   @override
-  State<AddTodaysDetails> createState() => _AddTodaysDetailsState();
+  ConsumerState<AddTodaysDetails> createState() => _AddTodaysDetailsState();
 }
 
-class _AddTodaysDetailsState extends State<AddTodaysDetails> {
+class _AddTodaysDetailsState extends ConsumerState<AddTodaysDetails> {
   TextEditingController weightController = TextEditingController();
   TextEditingController waterInTakeController = TextEditingController();
-  TextEditingController calorieIntakeController = TextEditingController();
   TextEditingController calorieBurnController = TextEditingController();
+  TextEditingController fatController = TextEditingController();
 
   bool isCompleted = false;
   bool isStarted = false;
+  String error = "";
+
+  saveProgress() async {
+    if (weightController.text.isEmpty ||
+        waterInTakeController.text.isEmpty ||
+        fatController.text.isEmpty ||
+        calorieBurnController.text.isEmpty) {
+      isCompleted = false;
+      isStarted = true;
+      setState(() {
+        error = "Please fill all";
+      });
+      return;
+    } else {
+      setState(() {
+        error = "";
+      });
+      isCompleted = true;
+      isStarted = true;
+    }
+    Progress progress = Progress(
+        dateTime: DateTime.now(),
+        weight: weightController.text.isEmpty
+            ? null
+            : double.parse(weightController.text),
+        fat: fatController.text.isEmpty
+            ? null
+            : double.parse(fatController.text),
+        calBurn: calorieBurnController.text.isEmpty
+            ? null
+            : double.parse(calorieBurnController.text),
+        waterIntake: waterInTakeController.text.isEmpty
+            ? null
+            : double.parse(waterInTakeController.text));
+
+    // print(progress);
+    final userId = ref.read(userProvider)?.id;
+    await UserService().saveTodaysProgress(progress, userId!);
+    ref.read(progressListProvider.notifier).fetchProgress(userId);
+
+    if (context.mounted) Navigator.of(context).pop();
+    if (context.mounted) Navigator.of(context).pop();
+  }
 
   saveAlert(BuildContext context) {
     Widget exitButton = TextButton(
+      onPressed: () => saveProgress(),
       child: Container(
         width: 100,
         height: 65,
@@ -51,11 +100,6 @@ class _AddTodaysDetailsState extends State<AddTodaysDetails> {
           ),
         ),
       ),
-      onPressed: () {
-        //save the progress
-        Navigator.of(context).pop();
-        Navigator.of(context).pop();
-      },
     );
 
     Widget continueButton = TextButton(
@@ -101,11 +145,12 @@ class _AddTodaysDetailsState extends State<AddTodaysDetails> {
           Container(
             margin: const EdgeInsets.only(bottom: 15),
             child: Text(
-              !isStarted
-                  ? "You didn't fill anything. Do you wanna exit?"
-                  : !isCompleted
-                      ? "You didn't complete. Do you wanna save and exit?"
-                      : "You Wanna Save the details?",
+              // !isStarted
+              //     ? "You didn't fill anything. Do you wanna exit?"
+              //     : !isCompleted
+              //         ? "You didn't complete. Do you wanna save and exit?"
+              // :
+              "You Wanna Save the details?",
               style: TextStyle(
                 fontSize: 14,
               ),
@@ -131,19 +176,26 @@ class _AddTodaysDetailsState extends State<AddTodaysDetails> {
   }
 
   void saveOrBack(BuildContext context) {
-    if (weightController.text.isEmpty &&
-        waterInTakeController.text.isEmpty &&
-        calorieBurnController.text.isEmpty &&
-        calorieIntakeController.text.isEmpty) {
-      isStarted = false;
-      isCompleted = false;
-    } else if (weightController.text.isEmpty ||
+    // if (weightController.text.isEmpty &&
+    //     waterInTakeController.text.isEmpty &&
+    //     fatController.text.isEmpty &&
+    //     calorieBurnController.text.isEmpty) {
+    //   isStarted = false;
+    //   isCompleted = false;
+    // } else
+    if (weightController.text.isEmpty ||
         waterInTakeController.text.isEmpty ||
-        calorieBurnController.text.isEmpty ||
-        calorieIntakeController.text.isEmpty) {
+        fatController.text.isEmpty ||
+        calorieBurnController.text.isEmpty) {
       isCompleted = false;
       isStarted = true;
+      setState(() {
+        error = "Please fill all";
+      });
     } else {
+      setState(() {
+        error = "";
+      });
       isCompleted = true;
       isStarted = true;
     }
@@ -155,8 +207,8 @@ class _AddTodaysDetailsState extends State<AddTodaysDetails> {
   void dispose() {
     weightController.dispose();
     waterInTakeController.dispose();
-    calorieIntakeController.dispose();
     calorieBurnController.dispose();
+    fatController.dispose();
     super.dispose();
   }
 
@@ -166,7 +218,8 @@ class _AddTodaysDetailsState extends State<AddTodaysDetails> {
     final width = MediaQuery.of(context).size.width;
     return WillPopScope(
       onWillPop: () async {
-        saveOrBack(context);
+        // saveOrBack(context);
+        if (context.mounted) Navigator.of(context).pop();
         return false;
       },
       child: Scaffold(
@@ -176,7 +229,8 @@ class _AddTodaysDetailsState extends State<AddTodaysDetails> {
           elevation: 0,
           leading: IconButton(
             onPressed: (() {
-              saveOrBack(context);
+              // saveOrBack(context);
+              if (context.mounted) Navigator.of(context).pop();
             }),
             icon: const Icon(
               Icons.arrow_back,
@@ -313,7 +367,54 @@ class _AddTodaysDetailsState extends State<AddTodaysDetails> {
                         // "Note".text.size(20).make(),
                         Expanded(
                           flex: 4,
-                          child: "Calorie Burned"
+                          child: "Fat"
+                              .text
+                              .make()
+                              .box
+                              .margin(const EdgeInsets.only(top: 8, bottom: 8))
+                              // .padding(EdgeInsets.only(top: 8))
+                              .make(),
+                        ),
+                        SizedBox(
+                          width: width * 0.25,
+                          height: height * 0.04,
+                          child: InputTextField(
+                            label: "",
+                            boardRadius: 14,
+                            fillColor: Pallete.surfaceColor3,
+                            hide: false,
+                            controller: fatController,
+                            type: TextInputType.number,
+                          ),
+                        ),
+                        "%"
+                            .text
+                            .make()
+                            .box
+                            .width(width * 0.06)
+                            .margin(EdgeInsets.only(left: 4))
+                            .make()
+                      ],
+                    ),
+                  ),
+                  //cal consumed
+                  Container(
+                    width: width * 0.85,
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Pallete.surfaceColor,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      // crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // "Note".text.size(20).make(),
+                        Expanded(
+                          flex: 4,
+                          child: "Calorie burn"
                               .text
                               .make()
                               .box
@@ -343,53 +444,12 @@ class _AddTodaysDetailsState extends State<AddTodaysDetails> {
                       ],
                     ),
                   ),
-                  //cal consumed
-                  Container(
-                    width: width * 0.85,
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Pallete.surfaceColor,
-                      borderRadius: BorderRadius.circular(15),
+                  if (error != "")
+                    SizedBox(
+                      height: height * 0.02,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      // crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // "Note".text.size(20).make(),
-                        Expanded(
-                          flex: 4,
-                          child: "calorie consumed"
-                              .text
-                              .make()
-                              .box
-                              .margin(const EdgeInsets.only(top: 8, bottom: 8))
-                              // .padding(EdgeInsets.only(top: 8))
-                              .make(),
-                        ),
-                        SizedBox(
-                          width: width * 0.25,
-                          height: height * 0.04,
-                          child: InputTextField(
-                            label: "",
-                            boardRadius: 14,
-                            fillColor: Pallete.surfaceColor3,
-                            hide: false,
-                            controller: calorieIntakeController,
-                            type: TextInputType.number,
-                          ),
-                        ),
-                        "cal"
-                            .text
-                            .make()
-                            .box
-                            .width(width * 0.06)
-                            .margin(EdgeInsets.only(left: 4))
-                            .make()
-                      ],
-                    ),
-                  ),
+                  if (error != "")
+                    "${error}".text.color(Pallete.primaryColor).make(),
                   Container(
                           child: ("Save")
                               .text
@@ -407,7 +467,8 @@ class _AddTodaysDetailsState extends State<AddTodaysDetails> {
                               .width(width * 0.4)
                               .makeCentered())
                       .onTap(() {
-                    saveOrBack(context);
+                    // saveOrBack(context);
+                    saveProgress();
                   })
                 ],
               ),

@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 
 import 'package:gympact/constants/enums.dart';
 import 'package:gympact/models/badges.dart';
@@ -12,43 +13,55 @@ import 'package:gympact/models/progress.dart';
 import 'package:gympact/models/workout.dart';
 
 class User {
-  final int id;
-  final int coin;
-  final int level;
-  final int gymId;
-  final double weight;
-  final double heigth;
+  int? id;
+  final int? coin;
+  final int? level;
+  String? gymId;
+  final double? weight;
+  final double? heigth;
   final String name;
   String? gender;
   final String phone;
-  final String email;
-  final String password;
-  final String goal;
-  final List<Badges> badgesList;
-  final List<Workout> workoutList;
-  final List<PastWorkout> pastWorkoutList;
-  final List<Progress> progressList;
+  String? email;
+  String? password;
+  String? goal;
+  String? profileImg;
+  int? highestStreak;
+  int? currentStreak;
+  int? highestStreakThisMonth;
+  int? waterReminder;
+  int? stretchReminder;
+  final List<Badges>? badgesList;
+  final List<Workout>? workoutList;
+  final List<PastWorkout>? pastWorkoutList;
+  final List<Progress>? progressList;
   final Diet? diet;
   final Progress? progress;
-  final CurrentPackage currentPackage;
-  final DateTime dob;
-  final DateTime joinOn;
-  final DateTime lastVisit;
+  final CurrentPackage? currentPackage;
+  final DateTime? dob;
+  final DateTime? joinOn;
+  final DateTime? lastVisit;
   final Role role;
 
   User({
-    required this.id,
+    this.id,
     required this.coin,
     required this.level,
-    required this.gymId,
+    this.gymId,
     required this.weight,
     required this.heigth,
     required this.name,
     this.gender,
     required this.phone,
-    required this.email,
-    required this.password,
-    required this.goal,
+    this.email,
+    this.password,
+    this.goal,
+    this.profileImg,
+    this.highestStreak,
+    this.currentStreak,
+    this.highestStreakThisMonth,
+    this.waterReminder,
+    this.stretchReminder,
     required this.badgesList,
     required this.workoutList,
     required this.pastWorkoutList,
@@ -66,7 +79,7 @@ class User {
     int? id,
     int? coin,
     int? level,
-    int? gymId,
+    String? gymId,
     double? weight,
     double? heigth,
     String? name,
@@ -75,6 +88,12 @@ class User {
     String? email,
     String? password,
     String? goal,
+    String? profileImg,
+    int? highestStreak,
+    int? currentStreak,
+    int? highestStreakThisMonth,
+    int? waterReminder,
+    int? stretchReminder,
     List<Badges>? badgesList,
     List<Workout>? workoutList,
     List<PastWorkout>? pastWorkoutList,
@@ -100,6 +119,13 @@ class User {
       email: email ?? this.email,
       password: password ?? this.password,
       goal: goal ?? this.goal,
+      profileImg: profileImg ?? this.profileImg,
+      highestStreak: highestStreak ?? this.highestStreak,
+      currentStreak: currentStreak ?? this.currentStreak,
+      highestStreakThisMonth:
+          highestStreakThisMonth ?? this.highestStreakThisMonth,
+      waterReminder: waterReminder ?? this.waterReminder,
+      stretchReminder: stretchReminder ?? this.stretchReminder,
       badgesList: badgesList ?? this.badgesList,
       workoutList: workoutList ?? this.workoutList,
       pastWorkoutList: pastWorkoutList ?? this.pastWorkoutList,
@@ -128,69 +154,113 @@ class User {
       'email': email,
       'password': password,
       'goal': goal,
-      'badgesList': badgesList.map((x) => x.toMap()).toList(),
-      'workoutList': workoutList.map((x) => x.toMap()).toList(),
-      'pastWorkoutList': pastWorkoutList.map((x) => x.toMap()).toList(),
-      'progressList': progressList.map((x) => x.toMap()).toList(),
+      'profileImg': profileImg,
+      'highestStreak': highestStreak,
+      'currentStreak': currentStreak,
+      'highestStreakThisMonth': highestStreakThisMonth,
+      'waterReminder': waterReminder,
+      'stretchReminder': stretchReminder,
+      'badgesList': badgesList?.map((x) => x.toMap()).toList(),
+      'workoutList': workoutList?.map((x) => x.toMap()).toList(),
+      'pastWorkoutList': pastWorkoutList?.map((x) => x.toMap()).toList(),
+      'progressList': progressList?.map((x) => x.toMap()).toList(),
       'diet': diet?.toMap(),
       'progress': progress?.toMap(),
-      'currentPackage': currentPackage.toMap(),
-      'dob': dob.millisecondsSinceEpoch,
-      'joinOn': joinOn.millisecondsSinceEpoch,
-      'lastVisit': lastVisit.millisecondsSinceEpoch,
-      'role': role,
+      'currentPackage': currentPackage?.toMap(),
+      'dob': dob != null
+          ? DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(dob!).toString()
+          : null,
+      'joinOn': joinOn != null
+          ? DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(joinOn!).toString()
+          : null,
+      'lastVisit': lastVisit != null
+          ? DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
+              .format(lastVisit!)
+              .toString()
+          : null,
+      'role': role.name,
     };
   }
 
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
-      id: map['id'] as int,
-      coin: map['coin'] as int,
-      level: map['level'] as int,
-      gymId: map['gymId'] as int,
-      weight: map['weight'] as double,
-      heigth: map['heigth'] as double,
+      id: map['id'] != null ? map['id'] as int : null,
+      coin: map['coin'] != null ? map['coin'] as int : null,
+      level: map['level'] != null ? map['level'] as int : null,
+      gymId: map['gymId'] != null ? map['gymId'] as String : null,
+      weight: map['weight'] != null ? map['weight'] as double : null,
+      heigth: map['heigth'] != null ? map['heigth'] as double : null,
       name: map['name'] as String,
       gender: map['gender'] != null ? map['gender'] as String : null,
       phone: map['phone'] as String,
-      email: map['email'] as String,
-      password: map['password'] as String,
-      goal: map['goal'] as String,
-      badgesList: List<Badges>.from(
-        (map['badgesList'] as List<int>).map<Badges>(
-          (x) => Badges.fromMap(x as Map<String, dynamic>),
-        ),
-      ),
-      workoutList: List<Workout>.from(
-        (map['workoutList'] as List<int>).map<Workout>(
-          (x) => Workout.fromMap(x as Map<String, dynamic>),
-        ),
-      ),
-      pastWorkoutList: List<PastWorkout>.from(
-        (map['pastWorkoutList'] as List<int>).map<PastWorkout>(
-          (x) => PastWorkout.fromMap(x as Map<String, dynamic>),
-        ),
-      ),
-      progressList: List<Progress>.from(
-        (map['progressList'] as List<int>).map<Progress>(
-          (x) => Progress.fromMap(x as Map<String, dynamic>),
-        ),
-      ),
+      email: map['email'] != null ? map['email'] as String : null,
+      password: map['password'] != null ? map['password'] as String : null,
+      goal: map['goal'] != null ? map['goal'] as String : null,
+      profileImg:
+          map['profileImg'] != null ? map['profileImg'] as String : null,
+      highestStreak:
+          map['highestStreak'] != null ? map['highestStreak'] as int : null,
+      currentStreak:
+          map['currentStreak'] != null ? map['currentStreak'] as int : null,
+      highestStreakThisMonth: map['highestStreakThisMonth'] != null
+          ? map['highestStreakThisMonth'] as int
+          : null,
+      waterReminder:
+          map['waterReminder'] != null ? map['waterReminder'] as int : null,
+      stretchReminder:
+          map['stretchReminder'] != null ? map['stretchReminder'] as int : null,
+      badgesList: map['badgesList'] != null
+          ? List<Badges>.from(
+              (map['badgesList'] as List<dynamic>).map<Badges?>(
+                (x) => Badges.fromMap(x as Map<String, dynamic>),
+              ),
+            )
+          : null,
+      workoutList: map['workoutList'] != null
+          ? List<Workout>.from(
+              (map['workoutList'] as List<dynamic>).map<Workout?>(
+                (x) => Workout.fromMap(x as Map<String, dynamic>),
+              ),
+            )
+          : null,
+      pastWorkoutList: map['pastWorkoutList'] != null
+          ? List<PastWorkout>.from(
+              (map['pastWorkoutList'] as List<dynamic>).map<PastWorkout?>(
+                (x) => PastWorkout.fromMap(x as Map<String, dynamic>),
+              ),
+            )
+          : null,
+      progressList: map['progressList'] != null
+          ? List<Progress>.from(
+              (map['progressList'] as List<dynamic>).map<Progress?>(
+                (x) => Progress.fromMap(x as Map<String, dynamic>),
+              ),
+            )
+          : null,
       diet: map['diet'] != null
           ? Diet.fromMap(map['diet'] as Map<String, dynamic>)
           : null,
       progress: map['progress'] != null
           ? Progress.fromMap(map['progress'] as Map<String, dynamic>)
           : null,
-      currentPackage:
-          CurrentPackage.fromMap(map['currentPackage'] as Map<String, dynamic>),
-      dob: DateTime.fromMillisecondsSinceEpoch(map['dob'] as int),
-      joinOn: DateTime.fromMillisecondsSinceEpoch(map['joinOn'] as int),
-      lastVisit: DateTime.fromMillisecondsSinceEpoch(map['lastVisit'] as int),
-      role: map['role'] as Role,
+      currentPackage: map['currentPackage'] != null
+          ? CurrentPackage.fromMap(
+              map['currentPackage'] as Map<String, dynamic>)
+          : null,
+      dob: map['dob'] != null
+          ? DateFormat("yyyy-MM-ddTHH:mm:ssZ").parse(map['dob'])
+          : null,
+      joinOn: map['joinOn'] != null
+          ? DateFormat("yyyy-MM-ddTHH:mm:ssZ").parse(map['joinOn'])
+          : null,
+      lastVisit: map['lastVisit'] != null
+          ? DateFormat("yyyy-MM-ddTHH:mm:ssZ").parse(map['lastVisit'])
+          : null,
+      role:
+          Role.values.firstWhere((e) => e.toString() == 'Role.${map['role']}'),
     );
   }
-
+//DateFormat("yyyy-MM-ddTHH:mm:ssZ").parse("sdsds")
   String toJson() => json.encode(toMap());
 
   factory User.fromJson(String source) =>
@@ -198,7 +268,7 @@ class User {
 
   @override
   String toString() {
-    return 'User(id: $id, coin: $coin, level: $level, gymId: $gymId, weight: $weight, heigth: $heigth, name: $name, gender: $gender, phone: $phone, email: $email, password: $password, goal: $goal, badgesList: $badgesList, workoutList: $workoutList, pastWorkoutList: $pastWorkoutList, progressList: $progressList, diet: $diet, progress: $progress, currentPackage: $currentPackage, dob: $dob, joinOn: $joinOn, lastVisit: $lastVisit, role: $role)';
+    return 'User(id: $id, coin: $coin, level: $level, gymId: $gymId, weight: $weight, heigth: $heigth, name: $name, gender: $gender, phone: $phone, email: $email, password: $password, goal: $goal, profileImg: $profileImg, highestStreak: $highestStreak, currentStreak: $currentStreak, highestStreakThisMonth: $highestStreakThisMonth, waterReminder: $waterReminder, stretchReminder: $stretchReminder, badgesList: $badgesList, workoutList: $workoutList, pastWorkoutList: $pastWorkoutList, progressList: $progressList, diet: $diet, progress: $progress, currentPackage: $currentPackage, dob: $dob, joinOn: $joinOn, lastVisit: $lastVisit, role: $role)';
   }
 
   @override
@@ -217,6 +287,12 @@ class User {
         other.email == email &&
         other.password == password &&
         other.goal == goal &&
+        other.profileImg == profileImg &&
+        other.highestStreak == highestStreak &&
+        other.currentStreak == currentStreak &&
+        other.highestStreakThisMonth == highestStreakThisMonth &&
+        other.waterReminder == waterReminder &&
+        other.stretchReminder == stretchReminder &&
         listEquals(other.badgesList, badgesList) &&
         listEquals(other.workoutList, workoutList) &&
         listEquals(other.pastWorkoutList, pastWorkoutList) &&
@@ -244,6 +320,12 @@ class User {
         email.hashCode ^
         password.hashCode ^
         goal.hashCode ^
+        profileImg.hashCode ^
+        highestStreak.hashCode ^
+        currentStreak.hashCode ^
+        highestStreakThisMonth.hashCode ^
+        waterReminder.hashCode ^
+        stretchReminder.hashCode ^
         badgesList.hashCode ^
         workoutList.hashCode ^
         pastWorkoutList.hashCode ^

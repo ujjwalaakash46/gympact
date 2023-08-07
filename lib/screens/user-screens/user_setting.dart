@@ -1,22 +1,67 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/common/widgets/text_field.dart';
 import 'package:gympact/constants/colors.dart';
+import 'package:gympact/provider/user_state.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class UserSetting extends StatefulWidget {
+import '../../models/user.dart';
+import '../../provider/gym_state.dart';
+import '../../service/user_service.dart';
+
+class UserSetting extends ConsumerStatefulWidget {
   static const userSettingRoute = "/user-setting";
   const UserSetting({super.key});
 
   @override
-  State<UserSetting> createState() => _UserSettingState();
+  ConsumerState<UserSetting> createState() => _UserSettingState();
 }
 
-class _UserSettingState extends State<UserSetting> {
+class _UserSettingState extends ConsumerState<UserSetting> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController weightController = TextEditingController();
   TextEditingController heightController = TextEditingController();
-  // late TextEditingController dobController;
+  String error = "";
+
+  saveData() async {
+    if (emailController.text.isEmpty ||
+        passwordController.text.isEmpty ||
+        weightController.text.isEmpty ||
+        heightController.text.isEmpty) {
+      setState(() {
+        error = "Please fill all";
+      });
+      return;
+    }
+    final gymId = ref.read(gymProvider)!.id;
+    User user = ref.read(userProvider)!;
+
+    user = user.copyWith(
+        email: emailController.text,
+        password: passwordController.text,
+        weight: double.parse(weightController.text),
+        heigth: double.parse(heightController.text));
+
+    final response = await UserService().updateUserData(gymId, user);
+    if (response.statusCode == 200) {
+      if (context.mounted) Navigator.of(context).pop();
+    } else {
+      setState(() {
+        error = "Error while saving";
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    final user = ref.read(userProvider);
+    emailController.text = user!.email ?? "";
+    passwordController.text = user.password ?? "";
+    weightController.text = user.weight.toString();
+    heightController.text = user.heigth.toString();
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -29,10 +74,10 @@ class _UserSettingState extends State<UserSetting> {
 
   @override
   Widget build(BuildContext context) {
-    emailController.text = "sdf";
-    passwordController.text = "ssdfdf";
-    weightController.text = "222";
-    heightController.text = "33";
+    // emailController.text = "sdf";
+    // passwordController.text = "ssdfdf";
+    // weightController.text = "222";
+    // heightController.text = "33";
 
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
@@ -106,8 +151,14 @@ class _UserSettingState extends State<UserSetting> {
                       type: TextInputType.number,
                     ),
                     SizedBox(
-                      height: height * 0.03,
+                      height: height * 0.02,
                     ),
+                    if (error != "")
+                      "${error}".text.color(Pallete.primaryColor).make(),
+                    if (error != "")
+                      SizedBox(
+                        height: height * 0.03,
+                      ),
                     Container(
                       height: height * 0.05,
                       width: width * 0.3,
@@ -121,7 +172,9 @@ class _UserSettingState extends State<UserSetting> {
                           .color(Pallete.surfaceColor)
                           .size(14)
                           .makeCentered(),
-                    ),
+                    ).onTap(() {
+                      saveData();
+                    }),
                   ],
                 ),
               ),

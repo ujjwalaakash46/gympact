@@ -1,16 +1,18 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:intl/intl.dart';
+
 class Progress {
-  final int id;
+  int? id;
   final DateTime dateTime;
-  final double weight;
-  final double fat;
-  final double calBurn;
-  final double waterIntake;
+  double? weight;
+  double? fat;
+  double? calBurn;
+  double? waterIntake;
 
   Progress({
-    required this.id,
+    this.id,
     required this.dateTime,
     required this.weight,
     required this.fat,
@@ -39,7 +41,8 @@ class Progress {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'dateTime': dateTime.millisecondsSinceEpoch,
+      'dateTime':
+          DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(dateTime).toString(),
       'weight': weight,
       'fat': fat,
       'calBurn': calBurn,
@@ -50,11 +53,12 @@ class Progress {
   factory Progress.fromMap(Map<String, dynamic> map) {
     return Progress(
       id: map['id'] as int,
-      dateTime: DateTime.fromMillisecondsSinceEpoch(map['dateTime'] as int),
-      weight: map['weight'] as double,
-      fat: map['fat'] as double,
-      calBurn: map['calBurn'] as double,
-      waterIntake: map['waterIntake'] as double,
+      dateTime: DateFormat("yyyy-MM-ddTHH:mm:ssZ").parse(map['dateTime']),
+      weight: map['weight'] != null ? map['weight'] as double : null,
+      fat: map['fat'] != null ? map['fat'] as double : null,
+      calBurn: map['calBurn'] != null ? map['calBurn'] as double : null,
+      waterIntake:
+          map['waterIntake'] != null ? map['waterIntake'] as double : null,
     );
   }
 

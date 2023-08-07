@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/constants/colors.dart';
 import 'package:gympact/constants/enums.dart';
 import 'package:gympact/models/current_package.dart';
@@ -10,99 +11,51 @@ import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class UserPastWorkout extends StatefulWidget {
+import '../../provider/user_state.dart';
+
+class UserPastWorkout extends ConsumerStatefulWidget {
   static const userPastWorkoutRoute = "/user-past-workout";
   const UserPastWorkout({super.key});
 
   @override
-  State<UserPastWorkout> createState() => _UserPastWorkoutState();
+  ConsumerState<UserPastWorkout> createState() => _UserPastWorkoutState();
 }
 
-class _UserPastWorkoutState extends State<UserPastWorkout> {
+class _UserPastWorkoutState extends ConsumerState<UserPastWorkout> {
   DateTime selectedDay = DateTime.now();
   List<Workout> workoutList = [];
 
   User user = User(
       gender: "male",
-      id: 12,
-      coin: 1004,
-      level: 5,
-      gymId: 007,
-      name: "Aman Gupta",
-      phone: "123",
-      email: "amangupta@gh",
-      password: "password",
-      progressList: [],
+      id: 1,
+      coin: 1,
+      level: 1,
+      gymId: "007",
+      name: "",
+      phone: "",
+      email: "",
+      password: "",
       badgesList: [],
       workoutList: [],
-      pastWorkoutList: [
-        PastWorkout(
-          id: 1,
-          dateTime: DateTime.now().add(const Duration(days: 2)),
-          workout: Workout(
-              id: 25,
-              gymId: "235",
-              name: "Push5",
-              discription: "desisis",
-              note: "note sdf",
-              createdDate: DateTime.now(),
-              updatedDate: DateTime.now(),
-              exercises: [],
-              durationInMin: 24),
-        ),
-        PastWorkout(
-          id: 1,
-          dateTime: DateTime.now().add(const Duration(days: -2)),
-          workout: Workout(
-              id: 25,
-              gymId: "235",
-              name: "Push5",
-              discription: "desisis",
-              note: "note sdf",
-              createdDate: DateTime.now(),
-              updatedDate: DateTime.now(),
-              exercises: [],
-              durationInMin: 24),
-        ),
-        PastWorkout(
-          id: 1,
-          dateTime: DateTime.now().add(const Duration(days: -6)),
-          workout: Workout(
-              id: 25,
-              gymId: "235",
-              name: "Push5",
-              discription: "desisis",
-              note: "note sdf",
-              createdDate: DateTime.now(),
-              updatedDate: DateTime.now(),
-              exercises: [],
-              durationInMin: 24),
-        )
-      ],
+      pastWorkoutList: [],
       diet: null,
       progress: null,
       weight: 65,
       heigth: 165,
       goal: "To get fitter",
-      currentPackage: CurrentPackage(
-          id: 2,
-          package: Package(
-              id: 1,
-              price: 600,
-              durationInMonths: 3,
-              name: "3 Month Power Plan",
-              benefits: ["rt", "as", "asd"]),
-          startDate: DateTime.now(),
-          endDate: DateTime.now().add(const Duration(days: 90))),
+      currentPackage: null,
       dob: DateTime(1999, 8, 1),
       joinOn: DateTime.now(),
       lastVisit: DateTime.now(),
+      progressList: [],
       role: Role.member);
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
+
+    user = ref.watch(userProvider) ?? user;
 
     return Scaffold(
       backgroundColor: Pallete.backgroundColor,
@@ -198,7 +151,7 @@ class _UserPastWorkoutState extends State<UserPastWorkout> {
                     },
                     selectedDayPredicate: (day) => isSameDay(day, selectedDay),
                     eventLoader: (date) {
-                      return user.pastWorkoutList
+                      return (user.pastWorkoutList ?? [])
                           .filter((e) => isSameDay(e.dateTime, date))
                           .map((e) => e.workout)
                           .toList();
@@ -227,7 +180,7 @@ class _UserPastWorkoutState extends State<UserPastWorkout> {
                               .size(16)
                               .makeCentered(),
                         ),
-                        ...user.pastWorkoutList
+                        ...(user.pastWorkoutList ?? [])
                             .filter((e) => isSameDay(e.dateTime, selectedDay))
                             .map((e) => Container(
                                   height: height * 0.1,
@@ -257,7 +210,7 @@ class _UserPastWorkoutState extends State<UserPastWorkout> {
                                   ),
                                 ))
                             .toList(),
-                        if (user.pastWorkoutList
+                        if ((user.pastWorkoutList ?? [])
                             .filter((e) => isSameDay(e.dateTime, selectedDay))
                             .map((e) => e.workout)
                             .toList()

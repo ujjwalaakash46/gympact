@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/common/widgets/text_field.dart';
 import 'package:gympact/constants/colors.dart';
+import 'package:gympact/constants/enums.dart';
 import 'package:gympact/models/exercise.dart';
+import 'package:gympact/models/user.dart';
 import 'package:gympact/models/workout.dart';
+import 'package:gympact/provider/gym_state.dart';
+import 'package:gympact/provider/user_state.dart';
+import 'package:gympact/service/workout_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class CreateWorkout extends StatefulWidget {
+class CreateWorkout extends ConsumerStatefulWidget {
   static const createWorkoutRoute = "/create-workout";
   const CreateWorkout({super.key});
 
   @override
-  State<CreateWorkout> createState() => _CreateWorkoutState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _CreateWorkoutState();
 }
 
 class ExerciseController {
@@ -23,7 +30,7 @@ class ExerciseController {
   String error = "";
 }
 
-class _CreateWorkoutState extends State<CreateWorkout> {
+class _CreateWorkoutState extends ConsumerState<CreateWorkout> {
   TextEditingController workoutNameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController durationController = TextEditingController();
@@ -65,7 +72,7 @@ class _CreateWorkoutState extends State<CreateWorkout> {
     }
   }
 
-  _onTapSave(BuildContext context) {
+  _onTapSave(BuildContext context) async {
     if (!_checkExercise()) {
       showErrorAlert(context, "Please fill required details of exercise");
     } else if (workoutNameController.text == "") {
@@ -73,31 +80,48 @@ class _CreateWorkoutState extends State<CreateWorkout> {
     } else if (durationController.text == "") {
       showErrorAlert(context, "Please fill time required for workout");
     } else {
-      Navigator.of(context).pop();
+      // Navigator.of(context).pop();
+      // print(DateTime.now());
+      Workout newWorkout = Workout(
+          name: workoutNameController.text,
+          discription: descriptionController.text,
+          note: "",
+          durationInMin: int.parse(durationController.text),
+          createdDate: DateTime.now(),
+          updatedDate: DateTime.now(),
+          exercises: [
+            ...exerciseList
+                .map((e) => Exercise(
+                    0,
+                    e.nameController.text,
+                    e.noteController.text,
+                    int.parse(e.setsController.text),
+                    int.parse(e.repsController.text),
+                    int.parse(e.weightController.text)))
+                .toList()
+          ]);
+
+      // save the workout;
+      User user = ref.read(userProvider.notifier).get()!;
+      final response = await WorkoutService().saveWorkout(user.id!, newWorkout);
+      if (response.statusCode == 200) {
+        if (user.role == Role.member) {
+          ref.read(userProvider.notifier).fetchUserData();
+        } else {
+          ref.read(gymProvider.notifier).fetchGymDetail();
+        }
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.of(context).pop();
+        });
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          showErrorAlert(context, "Error while saving");
+        });
+      }
     }
 
-    Workout newWorkout = Workout(
-        id: 12,
-        gymId: "sd",
-        name: workoutNameController.text,
-        discription: descriptionController.text,
-        note: "",
-        durationInMin: (durationController.text as int),
-        createdDate: DateTime.now(),
-        updatedDate: DateTime.now(),
-        exercises: [
-          ...exerciseList
-              .map((e) => Exercise(
-                  0,
-                  e.nameController.text,
-                  e.noteController.text,
-                  e.setsController.text as int,
-                  e.repsController.text as int,
-                  e.weightController.text as int))
-              .toList()
-        ]);
-
-    // save the workout;
+    // final pref = await SharedPreferences.getInstance();
+    // User userId = pref.getString("userId") ;
   }
 
   showErrorAlert(BuildContext context, String message) {

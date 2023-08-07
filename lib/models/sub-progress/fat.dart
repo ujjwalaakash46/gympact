@@ -1,6 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:intl/intl.dart';
+
 class Fat {
   final int id;
   final int value;
@@ -28,7 +30,7 @@ class Fat {
     return <String, dynamic>{
       'id': id,
       'value': value,
-      'dateTime': dateTime.millisecondsSinceEpoch,
+      'dateTime': dateTime.toIso8601String(),
     };
   }
 
@@ -36,7 +38,7 @@ class Fat {
     return Fat(
       id: map['id'] as int,
       value: map['value'] as int,
-      dateTime: DateTime.fromMillisecondsSinceEpoch(map['dateTime'] as int),
+      dateTime: DateFormat("yyyy-MM-ddTHH:mm:ssZ").parse(map['dateTime']),
     );
   }
 

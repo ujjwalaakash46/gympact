@@ -2,14 +2,15 @@
 import 'dart:convert';
 
 import 'package:gympact/models/workout.dart';
+import 'package:intl/intl.dart';
 
 class PastWorkout {
-  final int id;
+  int? id;
   final DateTime dateTime;
   final Workout workout;
   //percentage conpleted.
   PastWorkout({
-    required this.id,
+    this.id,
     required this.dateTime,
     required this.workout,
   });
@@ -29,7 +30,8 @@ class PastWorkout {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'dateTime': dateTime.millisecondsSinceEpoch,
+      'dateTime':
+          DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(dateTime).toString(),
       'workout': workout.toMap(),
     };
   }
@@ -37,7 +39,7 @@ class PastWorkout {
   factory PastWorkout.fromMap(Map<String, dynamic> map) {
     return PastWorkout(
       id: map['id'] as int,
-      dateTime: DateTime.fromMillisecondsSinceEpoch(map['dateTime'] as int),
+      dateTime: DateFormat("yyyy-MM-ddTHH:mm:ssZ").parse(map['dateTime']),
       workout: Workout.fromMap(map['workout'] as Map<String, dynamic>),
     );
   }

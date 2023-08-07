@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/constants/colors.dart';
 import 'package:gympact/models/exercise.dart';
 import 'package:gympact/models/workout.dart';
+import 'package:gympact/provider/gym_state.dart';
 import 'package:gympact/screens/common/create_workout.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class AdminWorkouts extends StatefulWidget {
+class AdminWorkouts extends ConsumerStatefulWidget {
   static const adminWorkoutsRoute = "/admin-workouts";
   const AdminWorkouts({super.key});
 
   @override
-  State<AdminWorkouts> createState() => _AdminWorkoutsState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _AdminWorkoutsState();
 }
 
-class _AdminWorkoutsState extends State<AdminWorkouts> {
+class _AdminWorkoutsState extends ConsumerState<AdminWorkouts> {
   bool isViewWorkout = false;
   int viewWorkoutIndex = 0;
 
   List<Workout> workoutList = [
     Workout(
         id: 21,
-        gymId: "23",
         name: "Push",
         discription: "desisis",
         note: "note sdf",
@@ -36,7 +37,6 @@ class _AdminWorkoutsState extends State<AdminWorkouts> {
         durationInMin: 24),
     Workout(
         id: 22,
-        gymId: "23",
         name: "Push2",
         discription: "desisis",
         note: "note sdf",
@@ -52,7 +52,6 @@ class _AdminWorkoutsState extends State<AdminWorkouts> {
         durationInMin: 24),
     Workout(
         id: 23,
-        gymId: "23",
         name: "Push3",
         discription: "desisis",
         note: "note sdf",
@@ -68,7 +67,6 @@ class _AdminWorkoutsState extends State<AdminWorkouts> {
         durationInMin: 24),
     Workout(
         id: 24,
-        gymId: "23",
         name: "Push4",
         discription: "desisis",
         note: "note sdf",
@@ -93,7 +91,6 @@ class _AdminWorkoutsState extends State<AdminWorkouts> {
         durationInMin: 24),
     Workout(
         id: 25,
-        gymId: "235",
         name: "Push5",
         discription: "desisis",
         note: "note sdf",
@@ -249,6 +246,9 @@ class _AdminWorkoutsState extends State<AdminWorkouts> {
 
   @override
   Widget build(BuildContext context) {
+    final workoutListState = ref.watch(gymProvider)?.workouts;
+    workoutList = workoutListState ?? [];
+
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return Scaffold(

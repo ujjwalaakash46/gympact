@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/constants/colors.dart';
 import 'package:gympact/models/diet.dart';
+import 'package:gympact/provider/user_state.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class DietPlan extends StatefulWidget {
+class DietPlan extends ConsumerStatefulWidget {
   static const dietPlanRoute = "/diet-plan";
   const DietPlan({super.key});
 
   @override
-  State<DietPlan> createState() => _DietPlanState();
+  ConsumerState<DietPlan> createState() => _DietPlanState();
 }
 
-class _DietPlanState extends State<DietPlan> {
+class _DietPlanState extends ConsumerState<DietPlan> {
   Diet diet = Diet(
       id: 1,
       name: "Normal",
@@ -27,6 +29,9 @@ class _DietPlanState extends State<DietPlan> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
+
+    diet = ref.watch(userProvider)?.diet ?? diet;
+
     return Scaffold(
       backgroundColor: Pallete.backgroundColor,
       appBar: AppBar(

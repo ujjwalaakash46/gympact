@@ -1,7 +1,69 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gympact/constants/colors.dart';
+import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
+
+import 'package:gympact/constants/colors.dart';
+import 'package:gympact/provider/gym_state.dart';
+import 'package:gympact/provider/user_state.dart';
+import 'package:gympact/service/user_service.dart';
+
+import '../../models/user.dart';
+
+class DiffProgress {
+  double weight;
+  String name;
+  DiffProgress({
+    required this.weight,
+    required this.name,
+  });
+
+  DiffProgress copyWith({
+    double? weight,
+    String? name,
+  }) {
+    return DiffProgress(
+      weight: weight ?? this.weight,
+      name: name ?? this.name,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'weight': weight,
+      'name': name,
+    };
+  }
+
+  factory DiffProgress.fromMap(Map<String, dynamic> map) {
+    return DiffProgress(
+      weight: map['weight'] as double,
+      name: map['name'] as String,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory DiffProgress.fromJson(String source) =>
+      DiffProgress.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() => 'DiffProgress(weight: $weight, name: $name)';
+
+  @override
+  bool operator ==(covariant DiffProgress other) {
+    if (identical(this, other)) return true;
+
+    return other.weight == weight && other.name == name;
+  }
+
+  @override
+  int get hashCode => weight.hashCode ^ name.hashCode;
+}
 
 class UserNotification extends ConsumerStatefulWidget {
   const UserNotification({super.key});
@@ -12,73 +74,85 @@ class UserNotification extends ConsumerStatefulWidget {
 }
 
 class _UserNotificationState extends ConsumerState<UserNotification> {
-  var notificationList = [
-    "Gym will be closed from 11am to 2pm  for tomorrow.",
-    "Your Package will end in 4 days. Pay early to avoid inconvenience.",
-    "Zumba session will be at 6pm Mon-Sat. ",
-    "Great Work! Trainer Arjun gave to “Silver Streak”. Now, get 10% off on your next package",
-  ];
+  var notificationList = [];
   var showAllStreakList = false;
-  var streakList = [
-    {"name": "Arjun Kumar", "streak": 24},
-    {"name": "Arun Kumar", "streak": 24},
-    {"name": "Aj Kumar", "streak": 23},
-    {"name": "Kumar", "streak": 21},
-    {"name": "jun Kumar", "streak": 20},
-    {"name": "mar", "streak": 20},
-    {"name": "Ku", "streak": 20},
-  ];
+  List<User> streakList = [];
 
   var showAllAchieversList = false;
-  var achieversList = [
-    {"name": "Arjun Kumar", "streak": 24},
-    {"name": "Arun Kumar", "streak": 24},
-    {"name": "Aj Kumar", "streak": 23},
-    {"name": "Kumar", "streak": 21},
-    {"name": "jun Kumar", "streak": 20},
-    {"name": "mar", "streak": 20},
-    {"name": "Ku", "streak": 20},
-  ];
+  List<DiffProgress> achieversList = [];
 
   var showAllBadgesList = false;
   var badgesList = [
-    {
-      "name": "Arjun Kumar",
-      "badges": ["/img", "/img"]
-    },
-    {
-      "name": "Arun Kumar",
-      "badges": ["/img", "/img"]
-    },
-    {
-      "name": "Aj Kumar",
-      "badges": ["/img"]
-    },
-    {
-      "name": "Kumar",
-      "badges": ["/img"]
-    },
-    {
-      "name": "jun Kumar",
-      "badges": ["/img"]
-    },
-    {
-      "name": "mar",
-      "badges": ["/img"]
-    },
-    {
-      "name": "Ku",
-      "badges": ["/img"]
-    },
+    // {
+    //   "name": "Arjun Kumar",
+    //   "badges": ["/img", "/img"]
+    // },
+    // {
+    //   "name": "Arun Kumar",
+    //   "badges": ["/img", "/img"]
+    // },
+    // {
+    //   "name": "Aj Kumar",
+    //   "badges": ["/img"]
+    // },
+    // {
+    //   "name": "Kumar",
+    //   "badges": ["/img"]
+    // },
+    // {
+    //   "name": "jun Kumar",
+    //   "badges": ["/img"]
+    // },
+    // {
+    //   "name": "mar",
+    //   "badges": ["/img"]
+    // },
+    // {
+    //   "name": "Ku",
+    //   "badges": ["/img"]
+    // },
   ];
 
   var currentMonth = "June";
+
+  fetchInitialData() async {
+    setState(() {
+      currentMonth = DateFormat('MMMM').format(DateTime.now());
+    });
+    final gymId = ref.read(gymProvider)?.id;
+    final responseStreak = await UserService().thisMonthStreakList(gymId!);
+    final responseAchiever = await UserService().highAchieverList(gymId);
+    if (responseStreak.statusCode == 200 &&
+        responseAchiever.statusCode == 200) {
+      setState(() {
+        print(responseStreak.body);
+        streakList = List<User>.from(
+            (json.decode(responseStreak.body) as List<dynamic>)
+                .map((e) => User.fromMap(e))
+                .toList());
+        achieversList = List<DiffProgress>.from(
+            (json.decode(responseStreak.body) as List<dynamic>)
+                .map((e) => DiffProgress.fromMap(e))
+                .toList());
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    fetchInitialData();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     var streakIndex = 0;
     var achieverIndex = 0;
     var badgesIndex = 0;
+
+    final noti = ref.watch(notificationProvider);
+    notificationList = noti;
+
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return SingleChildScrollView(
@@ -101,6 +175,20 @@ class _UserNotificationState extends ConsumerState<UserNotification> {
               SizedBox(
                 height: height * 0.03,
               ),
+              if (notificationList.isEmpty)
+                "No Notification"
+                    .text
+                    .color(Pallete.whiteDarkColor)
+                    .makeCentered()
+                    .box
+                    .width(width * 0.85)
+                    .padding(const EdgeInsets.all(12))
+                    .withDecoration(BoxDecoration(
+                      color: Pallete.surfaceColor2,
+                      borderRadius: BorderRadius.circular(15),
+                    ))
+                    .margin(EdgeInsets.symmetric(vertical: height * 0.02))
+                    .make(),
               ...notificationList.map(
                 (e) => Container(
                   width: width * 0.85,
@@ -110,7 +198,7 @@ class _UserNotificationState extends ConsumerState<UserNotification> {
                     color: Pallete.surfaceColor2,
                     borderRadius: BorderRadius.circular(15),
                   ),
-                  child: e.text.size(14).lineHeight(1.4).make(),
+                  child: e.data.text.size(14).lineHeight(1.4).make(),
                 ),
               ),
               SizedBox(
@@ -188,11 +276,12 @@ class _UserNotificationState extends ConsumerState<UserNotification> {
                             SizedBox(
                                 // color: Pallete.commonBlueColor,
                                 width: width * 0.55,
-                                child: Text(e["name"].toString())),
+                                child: Text(e.name.toString())),
                             SizedBox(
                                 // color: Pallete.blueColor,
                                 width: width * 0.07,
-                                child: Text(e["streak"].toString()))
+                                child:
+                                    Text(e.highestStreakThisMonth.toString()))
                           ],
                         ),
                       );
@@ -277,11 +366,11 @@ class _UserNotificationState extends ConsumerState<UserNotification> {
                             SizedBox(
                                 // color: Pallete.commonBlueColor,
                                 width: width * 0.55,
-                                child: Text(e["name"].toString())),
+                                child: Text(e.name.toString())),
                             SizedBox(
                                 // color: Pallete.blueColor,
-                                width: width * 0.07,
-                                child: Text(e["streak"].toString()))
+                                width: width * 0.09,
+                                child: Text(e.weight.toString()))
                           ],
                         ),
                       );
@@ -342,12 +431,30 @@ class _UserNotificationState extends ConsumerState<UserNotification> {
                           const EdgeInsets.only(top: 12, bottom: 16, left: 4),
                       width: width * 0.85,
                       child: Text(
-                        "People who Earned Badges in $currentMonth",
+                        "People who Earned Badges in $currentMonth}",
                         style: const TextStyle(fontSize: 16),
                       ),
                     ),
+                    if (badgesList.isEmpty)
+                      "adding this shortly"
+                          .text
+                          .color(Pallete.whiteDarkColor)
+                          .makeCentered()
+                          .box
+                          .width(width * 0.85)
+                          .padding(const EdgeInsets.all(12))
+                          // .withDecoration(BoxDecoration(
+                          //   color: Pallete.surfaceColor2,
+                          //   borderRadius: BorderRadius.circular(15),
+                          // ))
+                          // .margin(EdgeInsets.symmetric(vertical: height * 0.02))
+                          .make(),
                     ...badgesList
-                        .getRange(0, showAllBadgesList ? badgesList.length : 5)
+                        .getRange(
+                            0,
+                            showAllBadgesList || badgesList.length < 5
+                                ? badgesList.length
+                                : 5)
                         .map((e) {
                       badgesIndex++;
                       return Container(

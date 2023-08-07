@@ -4,13 +4,13 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 class Package {
-  final int id;
-  final int price;
+  int? id;
+  final double price;
   final int durationInMonths;
   final String name;
   final List<String> benefits;
   Package({
-    required this.id,
+    this.id,
     required this.price,
     required this.durationInMonths,
     required this.name,
@@ -19,7 +19,7 @@ class Package {
 
   Package copyWith({
     int? id,
-    int? price,
+    double? price,
     int? durationInMonths,
     String? name,
     List<String>? benefits,
@@ -46,10 +46,10 @@ class Package {
   factory Package.fromMap(Map<String, dynamic> map) {
     return Package(
       id: map['id'] as int,
-      price: map['price'] as int,
+      price: map['price'] as double,
       durationInMonths: map['durationInMonths'] as int,
       name: map['name'] as String,
-      benefits: List<String>.from((map['benefits'] as List<String>)),
+      benefits: List<String>.from((map['benefits'] as List<dynamic>)),
     );
   }
 

@@ -1,13 +1,13 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/constants/colors.dart';
 import 'package:gympact/constants/enums.dart';
-import 'package:gympact/models/badges.dart';
-import 'package:gympact/models/current_package.dart';
-import 'package:gympact/models/exercise.dart';
-import 'package:gympact/models/package.dart';
+import 'package:gympact/models/gym.dart';
 import 'package:gympact/models/user.dart';
-import 'package:gympact/models/workout.dart';
+import 'package:gympact/provider/gym_state.dart';
+import 'package:gympact/provider/user_state.dart';
 import 'package:gympact/screens/common/create_workout.dart';
 import 'package:gympact/screens/user-screens/user_attendance.dart';
 import 'package:gympact/screens/user-screens/user_past_workout.dart';
@@ -28,155 +28,77 @@ class _UserHomeState extends ConsumerState<UserHome> {
 
   User user = User(
       gender: "male",
-      id: 12,
-      coin: 1004,
-      level: 5,
-      gymId: 007,
-      name: "Aman Gupta",
-      phone: "123",
-      email: "amangupta@gh",
-      password: "password",
-      badgesList: [
-        Badges(id: 1, name: "best", img: "/img", date: DateTime.now()),
-        Badges(id: 4, name: "best4", img: "/img", date: DateTime.now()),
-        Badges(id: 5, name: "best5", img: "/img", date: DateTime.now()),
-        Badges(id: 6, name: "best6", img: "/img", date: DateTime.now()),
-        Badges(
-            id: 2,
-            name: "best2",
-            img: "/img",
-            date: DateTime.now().add(Duration(days: 70))),
-        Badges(
-            id: 3,
-            name: "best3",
-            img: "/img",
-            date: DateTime.now().add(Duration(days: 30))),
-      ],
-      workoutList: [
-        Workout(
-            id: 21,
-            gymId: "23",
-            name: "Push",
-            discription: "desisis",
-            note: "note sdf",
-            createdDate: DateTime.now(),
-            updatedDate: DateTime.now(),
-            exercises: [
-              Exercise(23, "bell", "note", 3, 12, 10),
-              Exercise(24, "push ups", "note", 3, 20, 0),
-              Exercise(23, "row", "note", 3, 12, 20),
-              Exercise(23, "bench", "note", 3, 12, 20),
-              Exercise(23, "extension", "note", 3, 12, 20),
-            ],
-            durationInMin: 24),
-        Workout(
-            id: 22,
-            gymId: "23",
-            name: "Push2",
-            discription: "desisis",
-            note: "note sdf",
-            createdDate: DateTime.now(),
-            updatedDate: DateTime.now(),
-            exercises: [
-              Exercise(23, "bell", "note", 3, 12, 10),
-              Exercise(24, "push ups", "note", 3, 20, 0),
-              Exercise(23, "row", "note", 3, 12, 20),
-              Exercise(23, "bench", "note", 3, 12, 20),
-              Exercise(23, "extension", "note", 3, 12, 20),
-            ],
-            durationInMin: 24),
-        Workout(
-            id: 23,
-            gymId: "23",
-            name: "Push3",
-            discription: "desisis",
-            note: "note sdf",
-            createdDate: DateTime.now(),
-            updatedDate: DateTime.now(),
-            exercises: [
-              Exercise(23, "bell", "note", 3, 12, 10),
-              Exercise(24, "push ups", "note", 3, 20, 0),
-              Exercise(23, "row", "note", 3, 12, 20),
-              Exercise(23, "bench", "note", 3, 12, 20),
-              Exercise(23, "extension", "note", 3, 12, 20),
-            ],
-            durationInMin: 24),
-        Workout(
-            id: 24,
-            gymId: "23",
-            name: "Push4",
-            discription: "desisis",
-            note: "note sdf",
-            createdDate: DateTime.now(),
-            updatedDate: DateTime.now(),
-            exercises: [
-              Exercise(23, "bell",
-                  "do whatever you want and be grateful for it", 3, 12, 10),
-              Exercise(24, "push ups", "note", 3, 20, 0),
-              Exercise(23, "row", "", 3, 12, 20),
-              Exercise(23, "bench", "", 3, 12, 20),
-              Exercise(23, "extension", "note", 3, 12, 20),
-              Exercise(23, "extension", "note", 3, 12, 20),
-              Exercise(23, "extension", "note", 3, 12, 20),
-              Exercise(23, "extension", "note", 3, 12, 20),
-              Exercise(23, "extension", "note", 3, 12, 20),
-              Exercise(23, "extension", "note", 3, 12, 20),
-              Exercise(23, "extension", "note", 3, 12, 20),
-              Exercise(23, "extension", "note", 3, 12, 20),
-              Exercise(23, "extension", "note", 3, 12, 20),
-            ],
-            durationInMin: 24),
-        Workout(
-            id: 25,
-            gymId: "235",
-            name: "Push5",
-            discription: "desisis",
-            note: "note sdf",
-            createdDate: DateTime.now(),
-            updatedDate: DateTime.now(),
-            exercises: [
-              Exercise(23, "bell", "note", 3, 12, 10),
-              Exercise(24, "push ups", "note", 3, 20, 0),
-              Exercise(23, "row", "note", 3, 12, 20),
-              Exercise(23, "bench", "note", 3, 12, 20),
-              Exercise(23, "extension", "note", 3, 12, 20),
-            ],
-            durationInMin: 24),
-      ],
+      id: 1,
+      coin: 1,
+      level: 1,
+      gymId: "007",
+      name: "",
+      phone: "",
+      email: "",
+      password: "",
+      badgesList: [],
+      workoutList: [],
       pastWorkoutList: [],
       diet: null,
       progress: null,
       weight: 65,
       heigth: 165,
       goal: "To get fitter",
-      currentPackage: CurrentPackage(
-          id: 2,
-          package: Package(
-              id: 1,
-              price: 600,
-              durationInMonths: 3,
-              name: "3 Month Power Plan",
-              benefits: ["rt", "as", "asd"]),
-          startDate: DateTime.now(),
-          endDate: DateTime.now().add(const Duration(days: 90))),
+      currentPackage: null,
       dob: DateTime(1999, 8, 1),
       joinOn: DateTime.now(),
       lastVisit: DateTime.now(),
       progressList: [],
       role: Role.member);
+  Gym gym = Gym(
+    id: 1,
+    name: "The Power Gym",
+    admins: [],
+    trainers: [],
+    workouts: [],
+    diets: [],
+    packages: [],
+    groups: [],
+  );
+
+  fetchDetails() async {
+    user = ref.read(userProvider.notifier).get()!;
+    gym = ref.read(gymProvider.notifier).get()!;
+    ref.read(homeMessageProvider.notifier).fetchMessages(user.id!);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchDetails();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
 
-    // var workoutList = [
-    //   {"name": "Push Day", "img": "url", "timeRequired": "45 min"},
-    //   {"name": "Leg Day", "img": "url", "timeRequired": "45 min"},
-    //   {"name": "Pull Day", "img": "url", "timeRequired": "45 min"},
-    //   {"name": "Warm up", "img": "url", "timeRequired": "10 min"},
-    //   {"name": "Push Day", "img": "url", "timeRequired": "60 min"},
-    // ];
+    user = ref.watch(userProvider) ?? user;
+    gym = ref.watch(gymProvider) ?? gym;
+
+    String message = "Yo do something";
+    Map<String, dynamic> messageMap = ref.watch(homeMessageProvider);
+    try {
+      List<String> movitaionalList =
+          (messageMap["movitaional"] as List<dynamic>)
+              .map((e) => e.toString())
+              .toList();
+
+      print(movitaionalList);
+      int messageIndex = Random().nextInt(movitaionalList.length);
+      message = movitaionalList[messageIndex];
+      print(message);
+    } catch (e) {
+      print(e);
+    }
+
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.all(8.0),
@@ -184,11 +106,7 @@ class _UserHomeState extends ConsumerState<UserHome> {
         child: Center(
           child: Column(
             children: [
-              const Text("GymPact")
-                  .text
-                  .color(Pallete.primaryColor)
-                  .size(24)
-                  .make(),
+              gym.name.text.color(Pallete.primaryColor).size(24).make(),
               Container(
                 margin: EdgeInsets.only(top: height * 0.03),
                 width: width * 0.85,
@@ -216,35 +134,35 @@ class _UserHomeState extends ConsumerState<UserHome> {
                   .padding(
                       EdgeInsets.only(top: height * 0.01, left: width * 0.055))
                   .make(),
-              Container(
-                margin: EdgeInsets.only(top: height * 0.03),
-                width: width * 0.85,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  // crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    14
-                        .toString()
-                        .text
-                        .color(Pallete.orange)
-                        .color(Pallete.secondaryColor)
-                        .fontWeight(FontWeight.w700)
-                        .size(16)
-                        .make(),
-                    ' days Streak! 🔥'
-                        .text
-                        .color(Pallete.secondaryColor)
-                        .fontWeight(FontWeight.w700)
-                        .size(16)
-                        .make()
-                  ],
+              if ((user.currentStreak ?? 0) != 0)
+                Container(
+                  margin: EdgeInsets.only(top: height * 0.03),
+                  width: width * 0.85,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    // crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      user.currentStreak
+                          .toString()
+                          .text
+                          .color(Pallete.orange)
+                          .color(Pallete.secondaryColor)
+                          .fontWeight(FontWeight.w700)
+                          .size(16)
+                          .make(),
+                      ' days Streak! 🔥'
+                          .text
+                          .color(Pallete.secondaryColor)
+                          .fontWeight(FontWeight.w700)
+                          .size(16)
+                          .make()
+                    ],
+                  ),
                 ),
-              ),
               SizedBox(
                 height: height * 0.03,
               ),
-              "You're doing great! Make your Attendace and Complete your today's workout."
-                  .text
+              message.text
                   .lineHeight(1.7)
                   .center
                   .make()
@@ -345,7 +263,7 @@ class _UserHomeState extends ConsumerState<UserHome> {
                     SizedBox(
                       height: height * 0.02,
                     ),
-                    ...user.workoutList.mapIndexed((workout, i) {
+                    ...(user.workoutList ?? []).mapIndexed((workout, i) {
                       return Container(
                         decoration: BoxDecoration(
                             color: Pallete.backgroundColor,

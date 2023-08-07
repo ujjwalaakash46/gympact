@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/constants/colors.dart';
+import 'package:gympact/constants/constants.dart';
 import 'package:gympact/constants/enums.dart';
 import 'package:gympact/common/common_methods.dart';
 import 'package:gympact/models/badges.dart';
 import 'package:gympact/models/current_package.dart';
 import 'package:gympact/models/package.dart';
 import 'package:gympact/models/user.dart';
+import 'package:gympact/provider/user_state.dart';
 import 'package:gympact/screens/user-screens/user_setting.dart';
 import 'package:velocity_x/velocity_x.dart';
+
+import '../../provider/gym_state.dart';
+import '../../service/user_service.dart';
 
 class UserProfile extends ConsumerStatefulWidget {
   const UserProfile({super.key});
@@ -20,29 +25,29 @@ class UserProfile extends ConsumerStatefulWidget {
 class _UserProfileState extends ConsumerState<UserProfile> {
   User user = User(
       gender: "male",
-      id: 12,
-      coin: 1004,
-      level: 5,
-      gymId: 007,
+      id: 1,
+      coin: 0,
+      level: 1,
+      gymId: "007",
       name: "Aman Gupta",
       phone: "123",
       email: "amangupta@gh",
       password: "password",
       badgesList: [
-        Badges(id: 1, name: "best", img: "/img", date: DateTime.now()),
-        Badges(id: 4, name: "best4", img: "/img", date: DateTime.now()),
-        Badges(id: 5, name: "best5", img: "/img", date: DateTime.now()),
-        Badges(id: 6, name: "best6", img: "/img", date: DateTime.now()),
-        Badges(
-            id: 2,
-            name: "best2",
-            img: "/img",
-            date: DateTime.now().add(Duration(days: 70))),
-        Badges(
-            id: 3,
-            name: "best3",
-            img: "/img",
-            date: DateTime.now().add(Duration(days: 30))),
+        //   Badges(id: 1, name: "best", img: "/img", date: DateTime.now()),
+        //   Badges(id: 4, name: "best4", img: "/img", date: DateTime.now()),
+        //   Badges(id: 5, name: "best5", img: "/img", date: DateTime.now()),
+        //   Badges(id: 6, name: "best6", img: "/img", date: DateTime.now()),
+        //   Badges(
+        //       id: 2,
+        //       name: "best2",
+        //       img: "/img",
+        //       date: DateTime.now().add(Duration(days: 70))),
+        //   Badges(
+        //       id: 3,
+        //       name: "best3",
+        //       img: "/img",
+        //       date: DateTime.now().add(Duration(days: 30))),
       ],
       workoutList: [],
       pastWorkoutList: [],
@@ -56,7 +61,7 @@ class _UserProfileState extends ConsumerState<UserProfile> {
           id: 2,
           package: Package(
               id: 1,
-              price: 600,
+              price: 6000,
               durationInMonths: 3,
               name: "3 Month Power Plan",
               benefits: ["rt", "as", "asd"]),
@@ -68,26 +73,29 @@ class _UserProfileState extends ConsumerState<UserProfile> {
       role: Role.member);
 
   int waterReminder = 0;
-  var waterReminderList = [
-    {"name": "No Reminder", "value": 0},
-    {"name": "1 hr", "value": 1},
-    {"name": "2 hrs", "value": 2},
-    {"name": "3 hrs", "value": 3},
-    {"name": "4 hrs", "value": 4},
-  ];
+  var waterReminderList = Constant.reminderInterval;
 
   int stretchingReminder = 0;
-  var stretchingReminderList = [
-    {"name": "No Reminder", "value": 0},
-    {"name": "1 hr", "value": 1},
-    {"name": "2 hrs", "value": 2},
-    {"name": "3 hrs", "value": 3},
-    {"name": "4 hrs", "value": 4},
-  ];
+  var stretchingReminderList = Constant.reminderInterval;
+
+  logout() {
+    UserService().logout(context);
+  }
+
+  saveReminder() async {
+    if (waterReminder != user.waterReminder ||
+        stretchingReminder != user.stretchReminder) {
+      final gymId = ref.read(gymProvider)!.id;
+      await UserService().updateUserData(gymId, user);
+    }
+  }
 
   var showSaveReminderBtn = false;
   @override
   Widget build(BuildContext context) {
+    user = ref.watch(userProvider)!;
+    stretchingReminder = user.stretchReminder ?? 0;
+    waterReminder = user.waterReminder ?? 0;
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return SingleChildScrollView(
@@ -188,13 +196,13 @@ class _UserProfileState extends ConsumerState<UserProfile> {
                       children: [
                         Column(
                           children: [
-                            user.currentPackage.package.name.text
+                            user.currentPackage!.package.name.text
                                 .color(Pallete.primaryColor)
                                 .make()
                                 .box
                                 .margin(const EdgeInsets.symmetric(vertical: 8))
                                 .make(),
-                            Text("${Common.formatDate(user.currentPackage.startDate)} - ${Common.formatDate(user.currentPackage.endDate)}")
+                            Text("${Common.formatDate(user.currentPackage!.startDate)} - ${Common.formatDate(user.currentPackage!.endDate)}")
                                 .box
                                 .margin(const EdgeInsets.only(bottom: 16))
                                 .make(),
@@ -209,7 +217,7 @@ class _UserProfileState extends ConsumerState<UserProfile> {
                                 .box
                                 .margin(const EdgeInsets.symmetric(vertical: 8))
                                 .make(),
-                            Common.formatDate(user.joinOn)
+                            Common.formatDate(user.joinOn ?? DateTime.now())
                                 .text
                                 .make()
                                 .box
@@ -324,7 +332,8 @@ class _UserProfileState extends ConsumerState<UserProfile> {
                         .box
                         .margin(EdgeInsets.only(top: 4, bottom: height * 0.012))
                         .make(),
-                    if (showSaveReminderBtn)
+                    if (waterReminder != user.waterReminder ||
+                        stretchingReminder != user.stretchReminder)
                       "save"
                           .text
                           .size(16)
@@ -332,12 +341,15 @@ class _UserProfileState extends ConsumerState<UserProfile> {
                           .makeCentered()
                           .box
                           .rounded
-                          .height(height * 0.03)
+                          .height(height * 0.04)
                           .margin(EdgeInsets.only(
                               left: width * 0.6, bottom: height * 0.012))
                           .width(width * 0.16)
                           .color(Pallete.primaryColor)
-                          .make(),
+                          .make()
+                          .onTap(() {
+                        saveReminder();
+                      }),
                     // "Badges Earned".text.make(),
                   ],
                 ),
@@ -363,37 +375,53 @@ class _UserProfileState extends ConsumerState<UserProfile> {
                         .box
                         .margin(const EdgeInsets.only(left: 10, bottom: 15))
                         .make(),
-                    SizedBox(
-                      height: height * 0.1,
-                      width: width * 0.85,
-                      child: GridView.count(
-                        physics: BouncingScrollPhysics(),
-                        scrollDirection: Axis.horizontal,
-                        crossAxisCount: 1,
-                        children: user.badgesList
-                            .map((e) => "${e.name}"
+                    Container(
+                        height: height * 0.1,
+                        width: width * 0.85,
+                        child: [
+                          if (true)
+                            "adding this shortly"
                                 .text
-                                .make()
+                                .color(Pallete.whiteDarkColor)
+                                .makeCentered()
                                 .box
-                                .margin(EdgeInsets.all(8))
-                                .height(10)
-                                .width(10)
-                                .color(Pallete.commonBlueColor)
-                                .make())
-                            .toList(),
-                      ),
-                    ),
+                                .width(width * 0.85)
+                                .padding(const EdgeInsets.all(12))
+                                .make(),
+                        ].first
+
+                        //Dont delete it!
+
+                        // GridView.count(
+                        //   physics: BouncingScrollPhysics(),
+                        //   scrollDirection: Axis.horizontal,
+                        //   crossAxisCount: 1,
+                        //   children: (user.badgesList ?? [])
+                        //       .map((e) => e.name.text
+                        //           .make()
+                        //           .box
+                        //           .margin(EdgeInsets.all(8))
+                        //           .height(10)
+                        //           .width(10)
+                        //           .color(Pallete.commonBlueColor)
+                        //           .make())
+                        //       .toList(),
+                        // ),
+
+                        ),
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 1,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   InkWell(
-                    onTap: (() {}),
+                    onTap: (() {
+                      logout();
+                    }),
                     child: Container(
                       height: height * 0.05,
                       width: width * 0.3,

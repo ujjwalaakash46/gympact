@@ -2,15 +2,16 @@
 import 'dart:convert';
 
 import 'package:gympact/models/package.dart';
+import 'package:intl/intl.dart';
 
 class CurrentPackage {
-  final int id;
+  int? id;
   final Package package;
   final DateTime startDate;
   final DateTime endDate;
 
   CurrentPackage({
-    required this.id,
+    this.id,
     required this.package,
     required this.startDate,
     required this.endDate,
@@ -33,19 +34,22 @@ class CurrentPackage {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'package': package.toMap(),
-      'startDate': startDate.millisecondsSinceEpoch,
-      'endDate': endDate.millisecondsSinceEpoch,
+      'packageDetails': package.toMap(),
+      'startDate':
+          DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(startDate).toString(),
+      'endDate':
+          DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(endDate).toString(),
     };
   }
 
   factory CurrentPackage.fromMap(Map<String, dynamic> map) {
     return CurrentPackage(
-      id: map['id'] as int,
-      package: Package.fromMap(map['package'] as Map<String, dynamic>),
-      startDate: DateTime.fromMillisecondsSinceEpoch(map['startDate'] as int),
-      endDate: DateTime.fromMillisecondsSinceEpoch(map['endDate'] as int),
-    );
+        id: map['id'] as int,
+        package: Package.fromMap(map['packageDetails'] as Map<String, dynamic>),
+        startDate: DateFormat("yyyy-MM-ddTHH:mm:ssZ").parse(map['startDate']),
+        endDate: DateFormat("yyyy-MM-ddTHH:mm:ssZ").parse(
+          (map['endDate']),
+        ));
   }
 
   String toJson() => json.encode(toMap());

@@ -2,7 +2,7 @@
 import 'dart:convert';
 
 class Diet {
-  final int id;
+  final int? id;
   final String name;
   final String note;
   final double protine;
@@ -11,7 +11,7 @@ class Diet {
   final String? calToBurn;
 
   Diet({
-    required this.id,
+    this.id,
     required this.name,
     required this.note,
     required this.protine,
@@ -57,7 +57,7 @@ class Diet {
       id: map['id'] as int,
       name: map['name'] as String,
       note: map['note'] as String,
-      protine: map['protine'] as double,
+      protine: double.parse(map['protine'].toString()),
       waterIntake:
           map['waterIntake'] != null ? map['waterIntake'] as String : null,
       calIntake: map['calIntake'] != null ? map['calIntake'] as String : null,

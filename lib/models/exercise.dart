@@ -2,7 +2,7 @@
 import 'dart:convert';
 
 class Exercise {
-  final int id;
+  final int? id;
   final String name;
   final String note;
   final int sets;

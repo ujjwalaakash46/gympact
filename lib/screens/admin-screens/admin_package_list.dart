@@ -1,18 +1,24 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/common/widgets/text_field.dart';
 import 'package:gympact/constants/colors.dart';
 import 'package:gympact/models/package.dart';
+import 'package:gympact/provider/gym_state.dart';
+import 'package:gympact/service/gym_service.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class AdminPackageList extends StatefulWidget {
+class AdminPackageList extends ConsumerStatefulWidget {
   static const adminPackageListRoute = "/admin-package-list";
   const AdminPackageList({super.key});
 
   @override
-  State<AdminPackageList> createState() => _AdminPackageListState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _AdminPackageListState();
 }
 
-class _AdminPackageListState extends State<AdminPackageList> {
+class _AdminPackageListState extends ConsumerState<AdminPackageList> {
   var packageList = [
     Package(
         id: 1,
@@ -59,7 +65,7 @@ class _AdminPackageListState extends State<AdminPackageList> {
     }
   }
 
-  _onTapSave(BuildContext context) {
+  _onTapSave(BuildContext context) async {
     var newErrorMessage = "";
     if (packageNameController.text.isEmpty) {
       newErrorMessage = "Set Package name";
@@ -82,7 +88,31 @@ class _AdminPackageListState extends State<AdminPackageList> {
       //
       //save package;
       //
-      _onExit();
+
+      final newPackage = Package(
+          price: double.parse(priceController.text),
+          durationInMonths: int.parse(durationInMonthController.text),
+          name: packageNameController.text,
+          benefits: finalBenefitList);
+
+      final gymId = ref.read(gymProvider)!.id;
+      final response = await GymService().savePackage(gymId, newPackage);
+      // final response = await WorkoutService().saveWorkout(user.id, newWorkout);
+      if (response.statusCode == 200) {
+        ref.read(gymProvider.notifier).fetchGymDetail();
+        setState(() {
+          packageNameController.text = '';
+          durationInMonthController.text = '';
+          priceController.text = '';
+          finalBenefitList = [];
+        });
+        _onExit();
+      } else {
+        var body = json.decode(response.body) as Map<dynamic, dynamic>;
+        setState(() {
+          error = "Error while save";
+        });
+      }
     }
   }
 
@@ -245,6 +275,11 @@ class _AdminPackageListState extends State<AdminPackageList> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
+
+    final gymState = ref.watch(gymProvider);
+    packageList = gymState?.packages ?? [];
+    // packageList = [];
+
     return Scaffold(
       backgroundColor: Pallete.backgroundColor,
       appBar: AppBar(
@@ -281,6 +316,14 @@ class _AdminPackageListState extends State<AdminPackageList> {
                   SizedBox(
                     height: height * 0.03,
                   ),
+                  if (packageList.isEmpty)
+                    "No Package Added"
+                        .text
+                        .color(Pallete.whiteDarkColor)
+                        .make()
+                        .box
+                        .margin(EdgeInsets.symmetric(vertical: height * 0.02))
+                        .make(),
                   ...packageList.mapIndexed((value, index) {
                     return Container(
                       width: width * 0.85,

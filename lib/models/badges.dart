@@ -1,6 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:intl/intl.dart';
+
 class Badges {
   final int id;
   final String name;
@@ -33,7 +35,7 @@ class Badges {
       'id': id,
       'name': name,
       'img': img,
-      'date': date.millisecondsSinceEpoch,
+      'date': DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(date).toString(),
     };
   }
 
@@ -42,7 +44,7 @@ class Badges {
       id: map['id'] as int,
       name: map['name'] as String,
       img: map['img'] as String,
-      date: DateTime.fromMillisecondsSinceEpoch(map['date'] as int),
+      date: DateFormat("yyyy-MM-ddTHH:mm:ssZ").parse(map['date']),
     );
   }
 

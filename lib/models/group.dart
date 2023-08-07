@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import 'package:gympact/models/user.dart';
+import 'package:intl/intl.dart';
 
 class Group {
   int? id;
@@ -127,7 +128,7 @@ class Message {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'createdOn': createdOn.millisecondsSinceEpoch,
+      'createdOn': createdOn.toIso8601String(),
       'data': data,
     };
   }
@@ -135,7 +136,7 @@ class Message {
   factory Message.fromMap(Map<String, dynamic> map) {
     return Message(
       id: map['id'] != null ? map['id'] as int : null,
-      createdOn: DateTime.fromMillisecondsSinceEpoch(map['createdOn'] as int),
+      createdOn: DateFormat("yyyy-MM-ddTHH:mm:ssZ").parse(map['createdOn']),
       data: map['data'] as String,
     );
   }

@@ -9,7 +9,8 @@ final themeNotifierProvider =
 
 class Pallete {
   // Colors
-  static const primaryColor = Color.fromARGB(255, 196, 255, 46);
+  // static const primaryColor = Color.fromARGB(255, 196, 255, 46);
+  static const primaryColor = Color.fromARGB(255, 227, 255, 46);
   static const secondaryColor = Color.fromRGBO(255, 255, 255, 1);
   static const brightness = Brightness.light;
   static const onPrimaryColor = Color.fromARGB(255, 37, 37, 37);
@@ -29,6 +30,7 @@ class Pallete {
   static const drawerColor = Color.fromRGBO(18, 18, 18, 1);
   static const whiteColor = Colors.white;
   static const whiteDarkColor = Color.fromARGB(255, 209, 209, 209);
+  static const whiteFadeColor = Color.fromARGB(255, 241, 241, 241);
   static var redColor = Colors.red.shade500;
   static var blueColor = Colors.blue.shade300;
   static const surfaceColor2 = Color.fromARGB(255, 50, 50, 50);

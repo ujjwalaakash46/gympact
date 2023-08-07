@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/common/widgets/text_field.dart';
 import 'package:gympact/constants/colors.dart';
 import 'package:gympact/constants/enums.dart';
@@ -13,14 +14,14 @@ import 'package:gympact/models/workout.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:search_choices/search_choices.dart';
 
-class AdminNotification extends StatefulWidget {
+class AdminNotification extends ConsumerStatefulWidget {
   const AdminNotification({super.key});
 
   @override
-  State<AdminNotification> createState() => _AdminNotificationState();
+  ConsumerState<AdminNotification> createState() => _AdminNotificationState();
 }
 
-class _AdminNotificationState extends State<AdminNotification> {
+class _AdminNotificationState extends ConsumerState<AdminNotification> {
   Gym gym = Gym(
     id: 1,
     name: "The Power Gym",
@@ -74,7 +75,7 @@ class _AdminNotificationState extends State<AdminNotification> {
         id: 12,
         coin: 1004,
         level: 5,
-        gymId: 007,
+        gymId: "007",
         name: "Aman Gupta",
         phone: "123",
         email: "amangupta@gh",
@@ -83,7 +84,6 @@ class _AdminNotificationState extends State<AdminNotification> {
         workoutList: [
           Workout(
               id: 21,
-              gymId: "23",
               name: "Push",
               discription: "desisis",
               note: "note sdf",
@@ -131,7 +131,7 @@ class _AdminNotificationState extends State<AdminNotification> {
         id: 12,
         coin: 1004,
         level: 5,
-        gymId: 007,
+        gymId: "007",
         name: "Aman Gupta",
         phone: "123",
         email: "amangupta@gh",
@@ -164,7 +164,7 @@ class _AdminNotificationState extends State<AdminNotification> {
         id: 12,
         coin: 1004,
         level: 5,
-        gymId: 007,
+        gymId: "007",
         name: "Aman Gupta",
         phone: "123",
         email: "amangupta@gh",
@@ -197,7 +197,6 @@ class _AdminNotificationState extends State<AdminNotification> {
   searchMember(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     // final height = MediaQuery.of(context).size.height;
-    print(2);
     return Container(
       // height: height * 0.046,
       decoration: BoxDecoration(
@@ -409,7 +408,7 @@ class _AdminNotificationState extends State<AdminNotification> {
               SizedBox(
                 height: height * 0.03,
               ),
-              ...gym.groups.mapIndexed(
+              ...(gym.groups ?? []).mapIndexed(
                 (e, index) => Container(
                   width: width * 0.85,
                   padding: const EdgeInsets.only(

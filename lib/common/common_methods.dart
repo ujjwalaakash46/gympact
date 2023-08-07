@@ -39,7 +39,7 @@ class Common {
 
   static List<FlSpot> flSpots(List<Progress> progressList, String type) {
     return progressList
-        .map((e) => FlSpot(e.dateTime.day.toDouble(), e.weight))
+        .map((e) => FlSpot(e.dateTime.day.toDouble(), e.weight ?? 0))
         .toList();
   }
 }

@@ -4,10 +4,10 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import 'package:gympact/models/exercise.dart';
+import 'package:intl/intl.dart';
 
 class Workout {
-  final int id;
-  final String gymId;
+  int? id;
   final String name;
   final String discription;
   final String note;
@@ -18,8 +18,7 @@ class Workout {
   //added by user
 
   Workout({
-    required this.id,
-    required this.gymId,
+    this.id,
     required this.name,
     required this.discription,
     required this.note,
@@ -42,7 +41,6 @@ class Workout {
   }) {
     return Workout(
       id: id ?? this.id,
-      gymId: gymId ?? this.gymId,
       name: name ?? this.name,
       discription: discription ?? this.discription,
       note: note ?? this.note,
@@ -56,13 +54,16 @@ class Workout {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'gymId': gymId,
       'name': name,
       'discription': discription,
       'note': note,
       'durationInMin': durationInMin,
-      'createdDate': createdDate.millisecondsSinceEpoch,
-      'updatedDate': updatedDate.millisecondsSinceEpoch,
+      'createdDate': DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
+          .format(createdDate)
+          .toString(),
+      'updatedDate': DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
+          .format(updatedDate)
+          .toString(),
       'exercises': exercises.map((x) => x.toMap()).toList(),
     };
   }
@@ -70,17 +71,14 @@ class Workout {
   factory Workout.fromMap(Map<String, dynamic> map) {
     return Workout(
       id: map['id'] as int,
-      gymId: map['gymId'] as String,
       name: map['name'] as String,
       discription: map['discription'] as String,
       note: map['note'] as String,
       durationInMin: map['durationInMin'] as int,
-      createdDate:
-          DateTime.fromMillisecondsSinceEpoch(map['createdDate'] as int),
-      updatedDate:
-          DateTime.fromMillisecondsSinceEpoch(map['updatedDate'] as int),
+      createdDate: DateFormat("yyyy-MM-ddTHH:mm:ssZ").parse(map['createdDate']),
+      updatedDate: DateFormat("yyyy-MM-ddTHH:mm:ssZ").parse(map['updatedDate']),
       exercises: List<Exercise>.from(
-        (map['exercises'] as List<int>).map<Exercise>(
+        (map['exercises'] as List<dynamic>).map<Exercise>(
           (x) => Exercise.fromMap(x as Map<String, dynamic>),
         ),
       ),
@@ -94,7 +92,7 @@ class Workout {
 
   @override
   String toString() {
-    return 'Workout(id: $id, gymId: $gymId, name: $name, discription: $discription, note: $note, durationInMin: $durationInMin, createdDate: $createdDate, updatedDate: $updatedDate, exercises: $exercises)';
+    return 'Workout(id: $id, name: $name, discription: $discription, note: $note, durationInMin: $durationInMin, createdDate: $createdDate, updatedDate: $updatedDate, exercises: $exercises)';
   }
 
   @override
@@ -102,7 +100,6 @@ class Workout {
     if (identical(this, other)) return true;
 
     return other.id == id &&
-        other.gymId == gymId &&
         other.name == name &&
         other.discription == discription &&
         other.note == note &&
@@ -115,7 +112,6 @@ class Workout {
   @override
   int get hashCode {
     return id.hashCode ^
-        gymId.hashCode ^
         name.hashCode ^
         discription.hashCode ^
         note.hashCode ^

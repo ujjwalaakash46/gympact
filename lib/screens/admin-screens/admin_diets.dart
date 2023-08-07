@@ -1,18 +1,23 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/common/widgets/text_field.dart';
 import 'package:gympact/constants/colors.dart';
 import 'package:gympact/models/diet.dart';
+import 'package:gympact/provider/gym_state.dart';
+import 'package:gympact/service/gym_service.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class AdminDiets extends StatefulWidget {
+class AdminDiets extends ConsumerStatefulWidget {
   static const adminDietsRoute = "/admin-diets";
   const AdminDiets({super.key});
 
   @override
-  State<AdminDiets> createState() => _AdminDietsState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _AdminDietsState();
 }
 
-class _AdminDietsState extends State<AdminDiets> {
+class _AdminDietsState extends ConsumerState<AdminDiets> {
   bool isViewDiet = false;
   // int viewDietIndex = 0;
   int dietDetailsIndex = -1;
@@ -210,6 +215,11 @@ class _AdminDietsState extends State<AdminDiets> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
+
+    final gymState = ref.watch(gymProvider);
+    diets = gymState?.diets ?? [];
+    // diets = [];
+
     return Scaffold(
       backgroundColor: Pallete.backgroundColor,
       appBar: AppBar(
@@ -275,15 +285,23 @@ class _AdminDietsState extends State<AdminDiets> {
                           .text
                           .color(Pallete.primaryFade2)
                           .makeCentered(),
-                    ).onTap(() {
-                      setState(() {
-                        addNewDiet = true;
-                      });
-                    }),
-                  ),
+                    ),
+                  ).onTap(() {
+                    setState(() {
+                      addNewDiet = true;
+                    });
+                  }),
                   SizedBox(
                     height: height * 0.02,
                   ),
+                  if (diets.isEmpty)
+                    "No diet plan added"
+                        .text
+                        .color(Pallete.whiteDarkColor)
+                        .make()
+                        .box
+                        .margin(EdgeInsets.symmetric(vertical: height * 0.02))
+                        .make(),
                   ...diets.mapIndexed((diet, i) {
                     return Container(
                       decoration: BoxDecoration(
@@ -385,7 +403,7 @@ class _AdminDietsState extends State<AdminDiets> {
     );
   }
 
-  _onTapSave(BuildContext context) {
+  _onTapSave(BuildContext context) async {
     var newErrorMessage = "";
     if (dietNameController.text.isEmpty) {
       newErrorMessage = "Set Diet Name";
@@ -401,6 +419,36 @@ class _AdminDietsState extends State<AdminDiets> {
       //
       //save package;
       //
+
+      Diet newDiet = Diet(
+        name: dietNameController.text,
+        note: noteController.text,
+        waterIntake: waterIntakeController.text,
+        calIntake: calorieIntakeController.text,
+        calToBurn: calorieToBurnController.text,
+        protine: double.parse(protienController.text),
+      );
+
+      final gymId = ref.read(gymProvider)!.id;
+      final response = await GymService().saveDiet(gymId, newDiet);
+      if (response.statusCode == 200) {
+        print(response.body);
+        ref.read(gymProvider.notifier).fetchGymDetail();
+        setState(() {
+          dietNameController.text = '';
+          noteController.text = '';
+          waterIntakeController.text = '';
+          calorieIntakeController.text = '';
+          calorieToBurnController.text = '';
+          protienController.text = '';
+          // finalBenefitList = [];
+        });
+      } else {
+        var body = json.decode(response.body) as Map<dynamic, dynamic>;
+        setState(() {
+          error = "Error while save";
+        });
+      }
       _onExit();
     }
   }

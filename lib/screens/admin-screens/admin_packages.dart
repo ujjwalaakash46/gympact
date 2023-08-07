@@ -1,29 +1,36 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/constants/colors.dart';
 import 'package:gympact/constants/enums.dart';
 import 'package:gympact/models/current_package.dart';
 import 'package:gympact/models/package.dart';
 import 'package:gympact/models/user.dart';
 import 'package:gympact/screens/admin-screens/admin_package_list.dart';
+import 'package:gympact/service/gym_service.dart';
 import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class AdminPackages extends StatefulWidget {
+import '../../provider/gym_state.dart';
+import '../../service/user_service.dart';
+
+class AdminPackages extends ConsumerStatefulWidget {
   static const adminPackagesRoute = "/admin-packages";
   const AdminPackages({super.key});
 
   @override
-  State<AdminPackages> createState() => _AdminPackagesState();
+  ConsumerState<AdminPackages> createState() => _AdminPackagesState();
 }
 
-class _AdminPackagesState extends State<AdminPackages> {
+class _AdminPackagesState extends ConsumerState<AdminPackages> {
   List<User> membershipEnded = [
     User(
         gender: "male",
         id: 12,
         coin: 1004,
         level: 5,
-        gymId: 007,
+        gymId: "007",
         name: "Aman Gupta",
         phone: "123",
         email: "amangupta@gh",
@@ -56,7 +63,7 @@ class _AdminPackagesState extends State<AdminPackages> {
         id: 12,
         coin: 1004,
         level: 5,
-        gymId: 007,
+        gymId: "007",
         name: "Aman Gupta",
         phone: "123",
         email: "amangupta@gh",
@@ -89,7 +96,7 @@ class _AdminPackagesState extends State<AdminPackages> {
         id: 12,
         coin: 1004,
         level: 5,
-        gymId: 007,
+        gymId: "007",
         name: "Aman Gupta",
         phone: "123",
         email: "amangupta@gh",
@@ -119,6 +126,7 @@ class _AdminPackagesState extends State<AdminPackages> {
         role: Role.member),
   ];
 
+  List<User> membershipEndedIn = [];
   int packageEnded = 12;
   int packageEndsIn = 23;
 
@@ -126,7 +134,17 @@ class _AdminPackagesState extends State<AdminPackages> {
   var showAllEndInList = false;
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final packageEndState = ref.watch(packageEndsProvider);
+
+    membershipEnded = (packageEndState.packageEnded ?? []);
+    membershipEndedIn = (packageEndState.packageEndsIn ?? []);
+
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -212,7 +230,7 @@ class _AdminPackagesState extends State<AdminPackages> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             "Package Ends".text.size(18).make(),
-                            packageEnded
+                            membershipEnded.length
                                 .toString()
                                 .text
                                 .color(Pallete.primaryColor)
@@ -271,7 +289,7 @@ class _AdminPackagesState extends State<AdminPackages> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 e.name.text.size(16).make(),
-                                                "Last Visited: ${DateFormat('d/MM/yyyy').format(e.lastVisit)}"
+                                                "Last Visited: ${DateFormat('d/MM/yyyy').format(e.lastVisit ?? DateTime.now())}"
                                                     .text
                                                     .color(
                                                         Pallete.whiteDarkColor)
@@ -297,7 +315,7 @@ class _AdminPackagesState extends State<AdminPackages> {
                                         Column(
                                           children: [
                                             "Last Package".text.make(),
-                                            e.currentPackage.package.name.text
+                                            e.currentPackage!.package.name.text
                                                 .color(Pallete.primaryColor)
                                                 .make()
                                           ],
@@ -305,7 +323,7 @@ class _AdminPackagesState extends State<AdminPackages> {
                                         Column(
                                           children: [
                                             "Joined on".text.make(),
-                                            "${DateFormat('d/MM/yyyy').format(e.joinOn)}"
+                                            "${DateFormat('d/MM/yyyy').format(e.joinOn ?? DateTime.now())}"
                                                 .text
                                                 .color(Pallete.primaryColor)
                                                 .make(),
@@ -416,7 +434,7 @@ class _AdminPackagesState extends State<AdminPackages> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             "Package Ends within 3days".text.size(16).make(),
-                            packageEnded
+                            membershipEndedIn.length
                                 .toString()
                                 .text
                                 .color(Pallete.primaryColor)
@@ -429,11 +447,11 @@ class _AdminPackagesState extends State<AdminPackages> {
                         SizedBox(
                           height: height * 0.02,
                         ),
-                        ...membershipEnded
+                        ...membershipEndedIn
                             .getRange(
                                 0,
-                                showAllEndInList || membershipEnded.length < 5
-                                    ? membershipEnded.length
+                                showAllEndInList || membershipEndedIn.length < 5
+                                    ? membershipEndedIn.length
                                     : 5)
                             .map(
                               (e) => Container(
@@ -475,7 +493,7 @@ class _AdminPackagesState extends State<AdminPackages> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 e.name.text.size(16).make(),
-                                                "last Visited: ${DateFormat('d/MM/yyyy').format(e.lastVisit)}"
+                                                "last Visited: ${DateFormat('d/MM/yyyy').format(e.lastVisit ?? DateTime.now())}"
                                                     .text
                                                     .color(
                                                         Pallete.whiteDarkColor)
@@ -501,7 +519,7 @@ class _AdminPackagesState extends State<AdminPackages> {
                                         Column(
                                           children: [
                                             "Current Package".text.make(),
-                                            e.currentPackage.package.name.text
+                                            e.currentPackage!.package.name.text
                                                 .color(Pallete.primaryColor)
                                                 .make()
                                           ],
@@ -509,7 +527,9 @@ class _AdminPackagesState extends State<AdminPackages> {
                                         Column(
                                           children: [
                                             "Ends on".text.make(),
-                                            "${DateFormat('d/MM/yyyy').format(e.currentPackage.endDate)}"
+                                            DateFormat('d/MM/yyyy')
+                                                .format(
+                                                    e.currentPackage!.endDate)
                                                 .text
                                                 .color(Pallete.primaryColor)
                                                 .make(),
@@ -581,7 +601,7 @@ class _AdminPackagesState extends State<AdminPackages> {
                                 ),
                               ),
                             ),
-                        if (membershipEnded.length > 5)
+                        if (membershipEndedIn.length > 5)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [

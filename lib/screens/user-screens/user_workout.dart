@@ -1,10 +1,17 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gympact/models/past_workout.dart';
+import 'package:gympact/provider/gym_state.dart';
+import 'package:gympact/provider/user_state.dart';
+import 'package:gympact/service/user_service.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import 'package:gympact/constants/colors.dart';
 import 'package:gympact/models/exercise.dart';
 import 'package:gympact/models/workout.dart';
+
+import '../../models/user.dart';
 
 class ExerciseChecked {
   Exercise exercise;
@@ -18,24 +25,24 @@ class ExerciseChecked {
   });
 }
 
-class UserWorkout extends StatefulWidget {
+class UserWorkout extends ConsumerStatefulWidget {
   static const userWorkoutRoute = "/user-workout";
 
   const UserWorkout({super.key});
 
   @override
-  State<UserWorkout> createState() => _UserWorkoutState();
+  ConsumerState<UserWorkout> createState() => _UserWorkoutState();
 }
 
-class _UserWorkoutState extends State<UserWorkout> {
+class _UserWorkoutState extends ConsumerState<UserWorkout> {
   bool initialize = true;
   bool workoutStarted = false;
   bool workoutCompleted = false;
+  String error = "";
 
   List<ExerciseChecked> exerciseList = [];
   Workout workout = Workout(
       id: 24,
-      gymId: "23",
       name: "Push Day",
       discription: "discription",
       note: "note",
@@ -200,6 +207,7 @@ class _UserWorkoutState extends State<UserWorkout> {
               "Great work Champion!\nKeep it up.",
               textAlign: TextAlign.center,
               style: TextStyle(
+                color: Pallete.whiteFadeColor,
                 fontSize: 18,
               ),
             ),
@@ -215,7 +223,8 @@ class _UserWorkoutState extends State<UserWorkout> {
                   children: [
                     TextSpan(
                       text: 'Your have earned\n',
-                      style: TextStyle(fontSize: 14, color: Pallete.whiteColor),
+                      style: TextStyle(
+                          fontSize: 14, color: Pallete.whiteFadeColor),
                     ),
                     TextSpan(
                       text: '+10 Respect',
@@ -224,7 +233,8 @@ class _UserWorkoutState extends State<UserWorkout> {
                     ),
                     TextSpan(
                       text: ' and\n',
-                      style: TextStyle(fontSize: 14, color: Pallete.whiteColor),
+                      style: TextStyle(
+                          fontSize: 14, color: Pallete.whiteFadeColor),
                     ),
                     TextSpan(
                       text: '+100 Powercoin!',
@@ -262,12 +272,25 @@ class _UserWorkoutState extends State<UserWorkout> {
     );
   }
 
-  onExit() {
+  onExit() async {
     if (workoutStarted) {
       if (!workoutCompleted) {
         workoutUnfinieshAlert(context);
       } else {
-        workoutFinishedAlert(context);
+        PastWorkout p = PastWorkout(dateTime: DateTime.now(), workout: workout);
+        User user = ref.read(userProvider.notifier).get()!;
+
+        final response = await UserService().savePastWorkout(user.id!, p);
+        if (response.statusCode == 200) {
+          setState(() {
+            error = "";
+          });
+          if (context.mounted) workoutFinishedAlert(context);
+        } else {
+          setState(() {
+            error = "Error while saving";
+          });
+        }
       }
     } else {
       Navigator.of(context).pop();
@@ -498,6 +521,7 @@ class _UserWorkoutState extends State<UserWorkout> {
                             ),
                           );
                         }).toList(),
+                        if (!error.isEmpty) error.text.make(),
                         if (workoutStarted)
                           Container(
                                   child: ((workoutCompleted)

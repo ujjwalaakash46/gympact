@@ -8,6 +8,7 @@ class InputTextField extends StatelessWidget {
       required this.label,
       this.hint = "",
       this.hide = false,
+      this.textInputAction,
       this.boardRadius = 25.7,
       this.fillColor = Pallete.surfaceColor2,
       required this.controller,
@@ -19,6 +20,7 @@ class InputTextField extends StatelessWidget {
   final String hint;
   final bool hide;
   final TextEditingController controller;
+  final TextInputAction? textInputAction;
   final TextInputType type;
   final double height;
   final double boardRadius;
@@ -41,6 +43,7 @@ class InputTextField extends StatelessWidget {
         ),
       ),
       TextField(
+        textInputAction: null,
         maxLines: type == TextInputType.multiline ? null : 1,
         obscureText: hide ? true : false,
         enableSuggestions: hide ? false : true,

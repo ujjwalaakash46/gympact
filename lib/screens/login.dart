@@ -1,14 +1,19 @@
-import 'package:carousel_slider/carousel_slider.dart';
+import 'dart:convert';
+
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:gympact/common/widgets/text_field.dart';
 import 'package:gympact/constants/colors.dart';
 import 'package:gympact/constants/enums.dart';
+import 'package:gympact/models/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:gympact/screens/admin-screens/admin_bottom_bar_nav.dart';
 import 'package:gympact/screens/user-screens/user_bottom_bar_nav.dart';
+import 'package:gympact/service/user_service.dart';
 
 class LoginScreen extends StatefulWidget {
+  static const loginScreenRoute = "/LoginScreenRoute";
   const LoginScreen({super.key});
 
   @override
@@ -16,10 +21,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  //pick from pref
-  //if not found -- login
-  //found then role based
-
   List<Widget> carouselSliderItems = [
     Image.asset(
       'assets/images/prelogin1.jpg',
@@ -37,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
       fit: BoxFit.cover,
     ),
   ];
-
+  User? user;
   String? usersName = "Aman";
   int screenIndex = 0;
   int carouselIndex = 0;
@@ -50,24 +51,46 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
 
-  checkPhoneNumber() {
+  checkPhoneNumber() async {
     String newError = "";
     if (phoneController.text.isEmpty) {
       newError = "Please Enter Phone Number";
+      setState(() {
+        error = newError;
+      });
+      return;
     } else {
-      //check number.
-      isPreLogin = true;
-    }
-    setState(() {
-      error = newError;
-      if (newError.isEmpty) {
-        screenIndex++;
+      final response = await UserService().checkPhone(phoneController.text);
+      if (response.statusCode == 200) {
+        User user = User.fromJson(response.body);
+        final pref = await SharedPreferences.getInstance();
+        pref.setString('user', response.body);
+        pref.setString('role', user.role.name);
+        var gym = json.decode(response.body)["gym"];
+        pref.setString('gym', json.encode(gym));
+        setState(() {
+          this.user = user;
+          isFirstLogin = user.email != null ? false : true;
+          emailController.text = user.email != null ? user.email! : "";
+          screenIndex = screenIndex == 2 ? 2 : screenIndex + 1;
+        });
+        if (context.mounted) {
+          FocusScope.of(context).requestFocus(FocusNode());
+        }
+      } else {
+        var body = json.decode(response.body) as Map<dynamic, dynamic>;
+        newError = body["message"];
+        setState(() {
+          error = newError;
+        });
+        return;
       }
-    });
+    }
   }
 
-  checkSignUp() {
+  checkSignUp(BuildContext context) async {
     String newError = "";
+
     if (isFirstLogin) {
       if (emailController.text.isEmpty) {
         newError = "Please enter email";
@@ -83,33 +106,65 @@ class _LoginScreenState extends State<LoginScreen> {
         newError = "Please enter password";
       }
     }
-
     setState(() {
       error = newError;
     });
     if (newError.isEmpty) {
-      //go to screen;
-
-      String route = UserBottomBarNav.userMainScreenRoute;
-      if (userRole == Role.admin) {
-        route = AdminBottomBarNav.adminMainScreenRoute;
-      } else if (userRole == Role.member) {
-        route = UserBottomBarNav.userMainScreenRoute;
+      dynamic response;
+      if (isFirstLogin) {
+        Map<String, String> signUpObj = <String, String>{};
+        signUpObj["email"] = emailController.text;
+        signUpObj["password"] = passwordController.text;
+        signUpObj["confirmPassword"] = confirmPasswordController.text;
+        signUpObj["userId"] = user!.id.toString();
+        response = await UserService().checkSignUp(signUpObj);
+      } else {
+        Map<String, String> loginObj = <String, String>{};
+        loginObj["email"] = emailController.text;
+        loginObj["password"] = passwordController.text;
+        loginObj["userId"] = user!.id.toString();
+        response = await UserService().checkLogin(loginObj);
       }
-      Navigator.of(context).pushNamed(route);
+      if (response.statusCode == 200) {
+        User user = User.fromJson(response.body);
+
+        final pref = await SharedPreferences.getInstance();
+        pref.setString('user', response.body);
+        pref.setString('role', user.role.name);
+        pref.setString('userId', user.id.toString());
+        var gym = json.decode(response.body)["gym"];
+        pref.setString('gym', json.encode(gym));
+        userRole = Role.values
+            .firstWhere((e) => e.toString() == 'Role.${user.role.name}');
+        String route = UserBottomBarNav.userMainScreenRoute;
+        if (userRole == Role.admin) {
+          route = AdminBottomBarNav.adminMainScreenRoute;
+        } else if (userRole == Role.member) {
+          route = UserBottomBarNav.userMainScreenRoute;
+        }
+        if (mounted) {
+          Navigator.of(context).pushReplacementNamed(route);
+        }
+        // WidgetsBinding.instance.addPostFrameCallback((_) {
+        // });
+      } else {
+        var body = json.decode(response.body) as Map<dynamic, dynamic>;
+        newError = body["message"];
+        setState(() {
+          error = newError;
+        });
+        return;
+      }
     }
   }
 
-  // getScreen(BuildContext context, index) {
-  //   final height = MediaQuery.of(context).size.height;
-  //   final width = MediaQuery.of(context).size.width;
-
-  //   return screenList[index];
-  // }
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    isFirstLogin = true;
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
 
@@ -240,24 +295,24 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       height: height * 0.06,
                     ),
-                    ("Next"
-                        .text
-                        .color(Pallete.surfaceColor)
-                        .makeCentered()
-                        .box
-                        .rounded
-                        .color(Pallete.primaryColor)
-                        .width(width * 0.4)
-                        .margin(EdgeInsets.only(top: height * 0.015))
-                        .height(height * 0.06)
-                        .border(color: Pallete.primaryColor)
-                        .makeCentered()
-                        .onTap(() {
-                      setState(() {
+                    InkWell(
+                      child: "Next"
+                          .text
+                          .color(Pallete.surfaceColor)
+                          .makeCentered()
+                          .box
+                          .rounded
+                          .color(Pallete.primaryColor)
+                          .width(width * 0.4)
+                          .margin(EdgeInsets.only(top: height * 0.015))
+                          .height(height * 0.06)
+                          .border(color: Pallete.primaryColor)
+                          .makeCentered(),
+                      onTap: () {
                         checkPhoneNumber();
-                      });
-                      // _onTapSave(context);
-                    })),
+                        // _onTapSave(context);
+                      },
+                    ),
                     SizedBox(
                       height: height * 0.03,
                     ),
@@ -270,7 +325,7 @@ class _LoginScreenState extends State<LoginScreen> {
         children: [
           Center(
             child: Container(
-                height: height * 0.6,
+                // height: height * 0.6,
                 width: width * 0.85,
                 margin: EdgeInsets.only(top: height * 0.1),
                 padding: EdgeInsets.only(
@@ -292,7 +347,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       height: height * 0.06,
                     ),
-                    "Hi ${usersName} 👋".text.size(16).make(),
+                    "Hi ${user?.name} 👋".text.size(16).make(),
                     SizedBox(
                       height: height * 0.02,
                     ),
@@ -347,7 +402,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         .makeCentered()
                         .onTap(() {
                       setState(() {
-                        checkSignUp();
+                        checkSignUp(context);
                       });
                       // _onTapSave(context);
                     })),

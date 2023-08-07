@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/constants/colors.dart';
 import 'package:gympact/models/attendance.dart';
+import 'package:gympact/provider/gym_state.dart';
+import 'package:gympact/provider/user_state.dart';
+import 'package:gympact/service/user_service.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -22,52 +25,55 @@ class _UserAttendanceState extends ConsumerState<UserAttendance> {
   String gymId = "1212";
   bool qrFound = false;
   bool attendanceMarked = true;
+  bool packageEnded = false;
 
   @override
   void initState() {
-    checkUserAttendance().then((value) => attendanceMarked = value);
-
+    final gym = ref.read(gymProvider)!;
+    gymId = gym.id.toString();
+    checkUserAttendance();
     super.initState();
   }
 
-  void _onDetect(BarcodeCapture capture) {
+  void _onDetect(BarcodeCapture capture) async {
     final List<Barcode> barcodes = capture.barcodes;
     for (final barcode in barcodes) {
       if (gymId == barcode.rawValue) {
-        qrFound = true;
-
-        // save in pref last attendance;
+        final userId = ref.read(userProvider)!.id;
+        final response = await UserService().markAttendance(userId!);
+        if (response.statusCode == 200) {
+          attendanceMarked = true;
+        } else if (response.statusCode == 406) {
+          attendanceMarked = false;
+          packageEnded = true;
+        }
+        setState(() {
+          attendanceMarked = attendanceMarked;
+          packageEnded = packageEnded;
+          qrFound = true;
+        });
       }
     }
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  Future<bool> checkUserAttendance() async {
-    var pref = await SharedPreferences.getInstance();
-    if (pref.get("lastAttendance") == null) {
-      //fetch if and store in pref.
-
-      return true;
+  checkUserAttendance() async {
+    final userId = ref.read(userProvider)!.id;
+    final response = await UserService().checkTodaysAttendance(userId!);
+    if (response.statusCode == 200) {
+      attendanceMarked = true;
+    } else if (response.statusCode == 406) {
+      attendanceMarked = false;
+      packageEnded = true;
     }
-
-    Attendance userLastAttendance =
-        Attendance.fromMap(jsonDecode(pref.get("lastAttendance").toString()));
-    DateTime today = DateTime.now();
-    if (userLastAttendance.dateTime.day == today.day &&
-        userLastAttendance.dateTime.month == today.month &&
-        userLastAttendance.dateTime.year == today.year) {
-      return true;
-    }
-
-    return true;
+    setState(() {
+      attendanceMarked = attendanceMarked;
+      packageEnded = packageEnded;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(userProvider)!;
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
 
@@ -94,7 +100,7 @@ class _UserAttendanceState extends ConsumerState<UserAttendance> {
               child: SizedBox(
                 width: width * 0.85,
                 child: Column(children: [
-                  if (!attendanceMarked) ...[
+                  if (!(attendanceMarked || packageEnded)) ...[
                     "Scan GYM QR".text.size(24).makeCentered(),
                     SizedBox(
                       height: height * 0.02,
@@ -127,15 +133,54 @@ class _UserAttendanceState extends ConsumerState<UserAttendance> {
                     SizedBox(
                       height: height * 0.1,
                     ),
-                    if (!qrFound) CircularProgressIndicator(),
-                    "Scanning".text.make().box.margin(EdgeInsets.all(8)).make(),
+                    if (!qrFound) const CircularProgressIndicator(),
+                    "Scanning"
+                        .text
+                        .make()
+                        .box
+                        .margin(const EdgeInsets.all(8))
+                        .make(),
                     SizedBox(
                       height: height * 0.1,
                     ),
                     "or".text.make(),
                     "Contact Admin to Mark Attendance".text.make(),
-                  ] else ...[
-                    Icon(
+                  ],
+                  if (packageEnded) ...[
+                    const Icon(
+                      Icons.report_gmailerrorred_rounded,
+                      color: Pallete.errorColor,
+                      size: 144,
+                    )
+                        .box
+                        .margin(EdgeInsets.only(
+                            top: height * 0.1, bottom: height * 0.03))
+                        .height(width * 0.6)
+                        .width(width * 0.6)
+                        .make(),
+                    // "Attendance Marked"
+                    "Package Expired"
+                        .text
+                        .align(TextAlign.center)
+                        .size(32)
+                        .makeCentered()
+                        .box
+                        .margin(EdgeInsets.only(bottom: height * 0.06))
+                        .width(width * 0.6)
+                        .make(),
+                    // "Marked".text.size(24).makeCentered(),
+                    // "Now, Go and push past your limits, Champion!"
+                    "Package expired on ${user.currentPackage!.endDate.day}/${user.currentPackage!.endDate.month}/${user.currentPackage!.endDate.year}\n Contact Admin for more information"
+                        .text
+                        .size(16)
+                        .align(TextAlign.center)
+                        .make()
+                        .box
+                        .width(width * 0.75)
+                        .make()
+                  ],
+                  if (attendanceMarked) ...[
+                    const Icon(
                       Icons.check_circle_outline_rounded,
                       color: Pallete.successColor,
                       size: 144,
@@ -156,6 +201,7 @@ class _UserAttendanceState extends ConsumerState<UserAttendance> {
                         .width(width * 0.6)
                         .make(),
                     // "Marked".text.size(24).makeCentered(),
+                    // "Package expired on ${user.currentPackage!.endDate.day}/${user.currentPackage!.endDate.month}/${user.currentPackage!.endDate.year}\n Contact Admin for more information"
                     "Now, Go and push past your limits, Champion!"
                         .text
                         .size(16)

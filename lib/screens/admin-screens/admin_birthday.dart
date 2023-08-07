@@ -1,28 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/constants/colors.dart';
 import 'package:gympact/constants/enums.dart';
 import 'package:gympact/models/current_package.dart';
 import 'package:gympact/models/package.dart';
 import 'package:gympact/models/user.dart';
+import 'package:gympact/provider/gym_state.dart';
+import 'package:gympact/service/user_service.dart';
 import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class AdminBirthday extends StatefulWidget {
+class AdminBirthday extends ConsumerStatefulWidget {
   static const adminBirthdayRoute = "/admin-birthday";
   const AdminBirthday({super.key});
 
   @override
-  State<AdminBirthday> createState() => _AdminBirthdayState();
+  ConsumerState<AdminBirthday> createState() => _AdminBirthdayState();
 }
 
-class _AdminBirthdayState extends State<AdminBirthday> {
+class _AdminBirthdayState extends ConsumerState<AdminBirthday> {
   List<User> birthdayList = [
     User(
         gender: "male",
         id: 12,
         coin: 1004,
         level: 5,
-        gymId: 007,
+        gymId: "007",
         name: "Aman Gupta",
         phone: "123",
         email: "amangupta@gh",
@@ -55,7 +58,7 @@ class _AdminBirthdayState extends State<AdminBirthday> {
         id: 12,
         coin: 1004,
         level: 5,
-        gymId: 007,
+        gymId: "007",
         name: "Aman Gupta",
         phone: "123",
         email: "amangupta@gh",
@@ -88,7 +91,7 @@ class _AdminBirthdayState extends State<AdminBirthday> {
         id: 12,
         coin: 1004,
         level: 5,
-        gymId: 007,
+        gymId: "007",
         name: "Aman Gupta",
         phone: "123",
         email: "amangupta@gh",
@@ -118,8 +121,22 @@ class _AdminBirthdayState extends State<AdminBirthday> {
         role: Role.member),
   ];
 
+  fetchList() async {
+    int gymId = ref.read(gymProvider)!.id;
+    birthdayList =
+        await ref.read(birthdayProvider.notifier).fetchBirthdayList(gymId);
+  }
+
+  @override
+  void initState() {
+    fetchList();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    // birthdayList = ref.watch(birthdayProvider);
+    birthdayList = [];
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -188,6 +205,15 @@ class _AdminBirthdayState extends State<AdminBirthday> {
                                 // SizedBox(
                                 //   height: height * 0.02,
                                 // ),
+                                if (birthdayList.isEmpty)
+                                  "No Birthday Today"
+                                      .text
+                                      .color(Pallete.whiteDarkColor)
+                                      .make()
+                                      .box
+                                      .margin(EdgeInsets.symmetric(
+                                          vertical: height * 0.02))
+                                      .make(),
                                 ...birthdayList.map(
                                   (e) => Container(
                                     // width: width * 0.9,
@@ -232,7 +258,7 @@ class _AdminBirthdayState extends State<AdminBirthday> {
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     e.name.text.size(16).make(),
-                                                    "Last Visited: ${DateFormat('d/MM/yyyy').format(e.lastVisit)}"
+                                                    "Last Visited: ${DateFormat('d/MM/yyyy').format(e.lastVisit ?? DateTime.now())}"
                                                         .text
                                                         .color(Pallete
                                                             .whiteDarkColor)
@@ -258,7 +284,7 @@ class _AdminBirthdayState extends State<AdminBirthday> {
                                             Column(
                                               children: [
                                                 "Last Package".text.make(),
-                                                e.currentPackage.package.name
+                                                e.currentPackage!.package.name
                                                     .text
                                                     .color(Pallete.primaryColor)
                                                     .make()
@@ -267,7 +293,7 @@ class _AdminBirthdayState extends State<AdminBirthday> {
                                             Column(
                                               children: [
                                                 "Joined on".text.make(),
-                                                "${DateFormat('d/MM/yyyy').format(e.joinOn)}"
+                                                "${DateFormat('d/MM/yyyy').format(e.joinOn ?? DateTime.now())}"
                                                     .text
                                                     .color(Pallete.primaryColor)
                                                     .make(),

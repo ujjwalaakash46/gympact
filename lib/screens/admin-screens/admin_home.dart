@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/constants/colors.dart';
 import 'package:gympact/models/gym.dart';
+import 'package:gympact/provider/gym_state.dart';
 import 'package:gympact/screens/admin-screens/admin_birthday.dart';
 import 'package:gympact/screens/admin-screens/admin_diets.dart';
 import 'package:gympact/screens/admin-screens/admin_packages.dart';
 import 'package:gympact/screens/admin-screens/admin_workouts.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class AdminHome extends StatefulWidget {
+class AdminHome extends ConsumerStatefulWidget {
   const AdminHome({super.key});
 
   @override
-  State<AdminHome> createState() => _AdminHomeState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _AdminHomeState();
 }
 
-class _AdminHomeState extends State<AdminHome> {
+class _AdminHomeState extends ConsumerState<AdminHome> {
   Gym gym = Gym(
     id: 1,
     name: "The Power Gym",
@@ -26,14 +28,61 @@ class _AdminHomeState extends State<AdminHome> {
     groups: [],
   );
 
-  int morningAttendance = 73;
-  int eveningAttendance = 93;
+  Gym gymInit = Gym(
+    id: 1,
+    name: "The Power Gym",
+    admins: [],
+    trainers: [],
+    workouts: [],
+    diets: [],
+    packages: [],
+    groups: [],
+  );
 
-  int packageEnded = 12;
-  int packageEndsIn = 23;
+  Map<String, int> attendanceMapInit = {
+    "todayMorning": 0,
+    "todayEvening": 0,
+    "yesterdayMorning": 0,
+    "yesterdayEvening": 0,
+  };
+  int todayMorning = 0;
+  int todayEvening = 0;
+
+  int packageEnded = 0;
+  int packageEndsIn = 0;
+
+  fetchDetails() async {
+    Gym gym = ref.read(gymProvider.notifier).get()!;
+    final attendState = ref.read(attendanceProvider.notifier);
+    attendanceMapInit =
+        await attendState.fetchAttendance(gym.id) ?? attendanceMapInit;
+
+    final packageEndState = ref.read(packageEndsProvider.notifier);
+    await packageEndState.fetchPackageEnded(gym.id);
+  }
+
+  @override
+  void initState() {
+    // fetchDetails();
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchDetails();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    gym = ref.watch(gymProvider) ?? gymInit;
+    final attendanceMap = ref.watch(attendanceProvider);
+    todayMorning = attendanceMap?["todayMorning"] ?? 0;
+    todayEvening = attendanceMap?["todayEvening"] ?? 0;
+
+    final packageEndState = ref.watch(packageEndsProvider);
+    packageEnded = (packageEndState.packageEnded ?? []).length;
+    packageEndsIn = (packageEndState.packageEndsIn ?? []).length;
+    // print(packageEndState.packageEnded);
+    // print(packageEnded);
+
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return SingleChildScrollView(
@@ -81,12 +130,15 @@ class _AdminHomeState extends State<AdminHome> {
                         .make()
                         .box
                         .margin(EdgeInsets.only(bottom: 16))
-                        .make(),
+                        .make()
+                        .onTap(() {
+                      // fetchGym();
+                    }),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         "Morning".text.make(),
-                        morningAttendance
+                        todayMorning
                             .toString()
                             .text
                             .color(Pallete.primaryColor)
@@ -103,7 +155,7 @@ class _AdminHomeState extends State<AdminHome> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         "Evening".text.make(),
-                        eveningAttendance
+                        todayEvening
                             .toString()
                             .text
                             .color(Pallete.primaryColor)
@@ -120,7 +172,7 @@ class _AdminHomeState extends State<AdminHome> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         "".text.make(),
-                        (morningAttendance + eveningAttendance)
+                        (todayMorning + todayEvening)
                             .toString()
                             .text
                             // .color(Pallete.primaryColor)
