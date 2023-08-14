@@ -131,11 +131,9 @@ class _UserProgressState extends ConsumerState<UserProgress> {
   fetchInitialData() async {
     final userId = ref.read(userProvider)?.id;
     await ref.read(progressDetailsProvider.notifier).fetchProgress(userId!);
-    print(2);
     final list =
         await ref.read(progressListProvider.notifier).fetchProgress(userId);
     ref.read(userProvider.notifier).updateProgess(list!);
-    print(list);
   }
 
   @override
@@ -149,14 +147,12 @@ class _UserProgressState extends ConsumerState<UserProgress> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     user = ref.watch(userProvider)!;
-    print("user");
-    print(user.progressList);
     final map = ref.watch(progressDetailsProvider);
     if (map["initialWeight"] != null) {
       // setState(() {
       initialWeight = (map["initialWeight"] as double).toInt();
       desiredWeight = int.parse(map["desiredWeight"]);
-      goalPercentage = double.parse(map["goalPercentage"]);
+      goalPercentage = double.parse(map["goalPercentage"]) / 100;
       bmi = double.parse(map["bmi"]);
       waterIntakeMessage = (map["waterIntakeMessage"]);
       fatMessage = (map["fatMessage"]);
@@ -335,7 +331,7 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ("${user.progressList![0].weight}kg")
+                        ("${user.progressList!.isEmpty ? user.weight : user.progressList?[0].weight}kg")
                             .text
                             .size(16)
                             .make(),
@@ -345,7 +341,9 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                             .make(),
                       ],
                     ),
-                    if (showWeightChart)
+                    if (showWeightChart &&
+                        user.progressList != null &&
+                        user.progressList!.isNotEmpty)
                       Container(
                         margin: EdgeInsets.only(top: height * 0.02),
                         // width: width * 0.7,
@@ -385,6 +383,14 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                           ),
                         ),
                       ),
+                    if (user.progressList == null || user.progressList!.isEmpty)
+                      "No Data Present"
+                          .text
+                          .color(Pallete.whiteFadeColor)
+                          .makeCentered()
+                          .box
+                          .margin(EdgeInsets.only(top: 4))
+                          .makeCentered(),
                     Container(
                       height: height * 0.03,
                       // color: Pallete.blueColor,
@@ -429,7 +435,10 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ("${user.progressList![0].fat}%").text.size(16).make(),
+                        ("${user.progressList!.isEmpty ? "-" : user.progressList?[0].fat}%")
+                            .text
+                            .size(16)
+                            .make(),
                         fatMessage
                             // "${weekWeight}kg loss in $inWeeks weeks")
                             .text
@@ -438,7 +447,9 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                             .make(),
                       ],
                     ),
-                    if (showfatChart)
+                    if (showfatChart &&
+                        user.progressList != null &&
+                        user.progressList!.isNotEmpty)
                       Container(
                         margin: EdgeInsets.only(top: height * 0.02),
                         // width: width * 0.7,
@@ -478,6 +489,14 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                           ),
                         ),
                       ),
+                    if (user.progressList == null || user.progressList!.isEmpty)
+                      "No Data Present"
+                          .text
+                          .color(Pallete.whiteFadeColor)
+                          .makeCentered()
+                          .box
+                          .margin(EdgeInsets.only(top: 4))
+                          .makeCentered(),
                     Container(
                       height: height * 0.03,
                       // color: Pallete.blueColor,
@@ -496,7 +515,7 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                           },
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -522,7 +541,7 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ("${user.progressList![0].weight} cal burn avg")
+                        ("${user.progressList!.isEmpty ? "-" : user.progressList?[0].weight} cal burn avg")
                             .text
                             .size(16)
                             .make(),
@@ -534,7 +553,9 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                             .make(),
                       ],
                     ),
-                    if (showCalBurnChart)
+                    if (showCalBurnChart &&
+                        user.progressList != null &&
+                        user.progressList!.isNotEmpty)
                       Container(
                         margin: EdgeInsets.only(top: height * 0.02),
                         // width: width * 0.7,
@@ -575,6 +596,14 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                           ),
                         ),
                       ),
+                    if (user.progressList == null || user.progressList!.isEmpty)
+                      "No Data Present"
+                          .text
+                          .color(Pallete.whiteFadeColor)
+                          .makeCentered()
+                          .box
+                          .margin(EdgeInsets.only(top: 4))
+                          .makeCentered(),
                     Container(
                       height: height * 0.03,
                       // color: Pallete.blueColor,
@@ -593,7 +622,7 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                           },
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -619,7 +648,7 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ("${user.progressList![0].waterIntake} L")
+                        ("${user.progressList!.isEmpty ? "-" : user.progressList?[0].waterIntake} L")
                             .text
                             .size(16)
                             .make(),
@@ -631,7 +660,9 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                             .make(),
                       ],
                     ),
-                    if (showwaterIntakeChart)
+                    if (showwaterIntakeChart &&
+                        user.progressList != null &&
+                        user.progressList!.isNotEmpty)
                       Container(
                         margin: EdgeInsets.only(top: height * 0.02),
                         // width: width * 0.7,
@@ -672,6 +703,14 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                           ),
                         ),
                       ),
+                    if (user.progressList == null || user.progressList!.isEmpty)
+                      "No Data Present"
+                          .text
+                          .color(Pallete.whiteFadeColor)
+                          .makeCentered()
+                          .box
+                          .margin(EdgeInsets.only(top: 4))
+                          .makeCentered(),
                     Container(
                       height: height * 0.03,
                       // color: Pallete.blueColor,
@@ -690,7 +729,7 @@ class _UserProgressState extends ConsumerState<UserProgress> {
                           },
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),

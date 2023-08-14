@@ -10,7 +10,7 @@ final themeNotifierProvider =
 class Pallete {
   // Colors
   // static const primaryColor = Color.fromARGB(255, 196, 255, 46);
-  static const primaryColor = Color.fromARGB(255, 227, 255, 46);
+  static const primaryColor = Color.fromARGB(255, 217, 255, 46);
   static const secondaryColor = Color.fromRGBO(255, 255, 255, 1);
   static const brightness = Brightness.light;
   static const onPrimaryColor = Color.fromARGB(255, 37, 37, 37);

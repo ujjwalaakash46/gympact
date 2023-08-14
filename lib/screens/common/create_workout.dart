@@ -217,209 +217,212 @@ class _CreateWorkoutState extends ConsumerState<CreateWorkout> {
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.all(8.0),
         child: SafeArea(
-          child: Center(
-            child: Column(
-              children: [
-                Container(
-                  // margin: const EdgeInsets.only(top: 0),
-                  width: width * 0.85,
-                  child: "Create Workout"
-                      .text
-                      .size(24)
-                      .fontFamily("Montserrat")
-                      .fontWeight(FontWeight.w900)
-                      .make(),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 12),
-                  // padding: EdgeInsets.symmetric(horizontal: 12),
-                  width: width * 0.85,
-                  child: InputTextField(
-                    label: "Workout Name",
-                    hint: "eg Push Day",
-                    type: TextInputType.name,
-                    controller: workoutNameController,
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 10),
-                  // padding: EdgeInsets.symmetric(horizontal: 12),
-                  width: width * 0.85,
-                  child: InputTextField(
-                    height: 0,
-                    label: "Description",
-                    hint: "eg: do as the list and last set to the limmit",
-                    type: TextInputType.multiline,
-                    controller: descriptionController,
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 10, bottom: 10),
-                  // padding: EdgeInsets.symmetric(horizontal: 12),
-                  width: width * 0.85,
-                  child: InputTextField(
-                    label: "Time Required",
-                    hint: "eg 45 (in min)",
-                    type: TextInputType.number,
-                    controller: durationController,
-                  ),
-                ),
-                ...exerciseList.map((e) {
-                  return Container(
-                    margin: EdgeInsets.only(top: height * 0.02),
-                    padding: EdgeInsets.symmetric(
-                      vertical: height * 0.02,
-                    ),
+          child: GestureDetector(
+            onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+            child: Center(
+              child: Column(
+                children: [
+                  Container(
+                    // margin: const EdgeInsets.only(top: 0),
                     width: width * 0.85,
-                    decoration: BoxDecoration(
-                        color: Pallete.surfaceColor3,
-                        borderRadius: BorderRadius.circular(25)),
-                    child: Column(
-                      // crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          child: "${e.id + 1}. Exercise"
-                              .text
-                              .semiBold
-                              .size(16)
-                              .make(),
-                          width: width * 0.7,
-                          margin: EdgeInsets.only(bottom: 12),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(bottom: 10),
-                          width: width * 0.75,
-                          child: InputTextField(
-                            label: "Exercise Name",
-                            hint: "eg Bench press",
-                            type: TextInputType.name,
-                            controller: e.nameController,
+                    child: "Create Workout"
+                        .text
+                        .size(24)
+                        .fontFamily("Montserrat")
+                        .fontWeight(FontWeight.w900)
+                        .make(),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 12),
+                    // padding: EdgeInsets.symmetric(horizontal: 12),
+                    width: width * 0.85,
+                    child: InputTextField(
+                      label: "Workout Name",
+                      hint: "eg Push Day",
+                      type: TextInputType.name,
+                      controller: workoutNameController,
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 10),
+                    // padding: EdgeInsets.symmetric(horizontal: 12),
+                    width: width * 0.85,
+                    child: InputTextField(
+                      height: 0,
+                      label: "Description",
+                      hint: "eg: do as the list and last set to the limmit",
+                      type: TextInputType.multiline,
+                      controller: descriptionController,
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 10, bottom: 10),
+                    // padding: EdgeInsets.symmetric(horizontal: 12),
+                    width: width * 0.85,
+                    child: InputTextField(
+                      label: "Time Required",
+                      hint: "eg 45 (in min)",
+                      type: TextInputType.number,
+                      controller: durationController,
+                    ),
+                  ),
+                  ...exerciseList.map((e) {
+                    return Container(
+                      margin: EdgeInsets.only(top: height * 0.02),
+                      padding: EdgeInsets.symmetric(
+                        vertical: height * 0.02,
+                      ),
+                      width: width * 0.85,
+                      decoration: BoxDecoration(
+                          color: Pallete.surfaceColor3,
+                          borderRadius: BorderRadius.circular(25)),
+                      child: Column(
+                        // crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            child: "${e.id + 1}. Exercise"
+                                .text
+                                .semiBold
+                                .size(16)
+                                .make(),
+                            width: width * 0.7,
+                            margin: EdgeInsets.only(bottom: 12),
                           ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(bottom: 10),
-                          width: width * 0.75,
-                          child: InputTextField(
-                            label: "note",
-                            hint: "(optional)",
-                            type: TextInputType.multiline,
-                            controller: e.noteController,
+                          Container(
+                            margin: EdgeInsets.only(bottom: 10),
+                            width: width * 0.75,
+                            child: InputTextField(
+                              label: "Exercise Name",
+                              hint: "eg Bench press",
+                              type: TextInputType.name,
+                              controller: e.nameController,
+                            ),
                           ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Container(
-                              margin: EdgeInsets.only(bottom: 10),
-                              width: width * 0.350,
-                              child: InputTextField(
-                                label: "Reps",
-                                hint: "eg 3",
-                                type: TextInputType.number,
-                                controller: e.repsController,
-                              ),
+                          Container(
+                            margin: EdgeInsets.only(bottom: 10),
+                            width: width * 0.75,
+                            child: InputTextField(
+                              label: "note",
+                              hint: "(optional)",
+                              type: TextInputType.multiline,
+                              controller: e.noteController,
                             ),
-                            Container(
-                              margin: EdgeInsets.only(bottom: 10),
-                              width: width * 0.350,
-                              child: InputTextField(
-                                label: "Sets",
-                                hint: "eg 12",
-                                type: TextInputType.number,
-                                controller: e.setsController,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          width: width * 0.85,
-                          child: Row(
+                          ),
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               Container(
-                                // margin: EdgeInsets.only(bottom: 10),
+                                margin: EdgeInsets.only(bottom: 10),
                                 width: width * 0.350,
                                 child: InputTextField(
-                                  label: "weight",
-                                  hint: "(optional)",
+                                  label: "Reps",
+                                  hint: "eg 3",
                                   type: TextInputType.number,
-                                  controller: e.weightController,
+                                  controller: e.repsController,
                                 ),
                               ),
-                              if (exerciseList.length > 1)
-                                Container(
-                                    decoration: BoxDecoration(
-                                        color: Pallete.whiteDarkColor,
-                                        borderRadius:
-                                            BorderRadius.circular(25)),
-                                    // margin: EdgeInsets.only(bottom: 10),
-                                    width: width * 0.350,
-                                    child: IconButton(
-                                      icon: const Icon(
-                                        Icons.delete_forever_rounded,
-                                        color: Pallete.errorColor,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          exerciseList.removeAt(e.id);
-                                          var i = 0;
-                                          for (var exe in exerciseList) {
-                                            exe.id = i;
-                                            i++;
-                                          }
-                                        });
-                                      },
-                                    )),
+                              Container(
+                                margin: EdgeInsets.only(bottom: 10),
+                                width: width * 0.350,
+                                child: InputTextField(
+                                  label: "Sets",
+                                  hint: "eg 12",
+                                  type: TextInputType.number,
+                                  controller: e.setsController,
+                                ),
+                              ),
                             ],
                           ),
-                        ),
-                        if (e.error != "")
-                          "${e.error}".text.color(Pallete.primaryColor).make()
+                          SizedBox(
+                            width: width * 0.85,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Container(
+                                  // margin: EdgeInsets.only(bottom: 10),
+                                  width: width * 0.350,
+                                  child: InputTextField(
+                                    label: "weight",
+                                    hint: "(optional)",
+                                    type: TextInputType.number,
+                                    controller: e.weightController,
+                                  ),
+                                ),
+                                if (exerciseList.length > 1)
+                                  Container(
+                                      decoration: BoxDecoration(
+                                          color: Pallete.whiteDarkColor,
+                                          borderRadius:
+                                              BorderRadius.circular(25)),
+                                      // margin: EdgeInsets.only(bottom: 10),
+                                      width: width * 0.350,
+                                      child: IconButton(
+                                        icon: const Icon(
+                                          Icons.delete_forever_rounded,
+                                          color: Pallete.errorColor,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            exerciseList.removeAt(e.id);
+                                            var i = 0;
+                                            for (var exe in exerciseList) {
+                                              exe.id = i;
+                                              i++;
+                                            }
+                                          });
+                                        },
+                                      )),
+                              ],
+                            ),
+                          ),
+                          if (e.error != "")
+                            "${e.error}".text.color(Pallete.primaryColor).make()
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  Container(
+                    width: width * 0.85,
+                    margin: EdgeInsets.only(bottom: 15, top: 4),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        "Add Exercise"
+                            .text
+                            .color(Pallete.primaryColor)
+                            .makeCentered()
+                            .box
+                            .rounded
+                            .color(Pallete.surfaceColor2)
+                            .width(width * 0.4)
+                            .margin(EdgeInsets.only(top: height * 0.015))
+                            .height(height * 0.06)
+                            .border(color: Pallete.primaryColor)
+                            .makeCentered()
+                            .onInkTap(() {
+                          _onTapAddExercise();
+                        }),
+                        // if (exerciseList.length > 1)
+                        ("Save Workout"
+                            .text
+                            .color(Pallete.surfaceColor)
+                            .makeCentered()
+                            .box
+                            .rounded
+                            .color(Pallete.primaryColor)
+                            .width(width * 0.4)
+                            .margin(EdgeInsets.only(top: height * 0.015))
+                            .height(height * 0.06)
+                            .border(color: Pallete.primaryColor)
+                            .makeCentered()
+                            .onInkTap(() {
+                          _onTapSave(context);
+                        }))
                       ],
                     ),
-                  );
-                }).toList(),
-                Container(
-                  width: width * 0.85,
-                  margin: EdgeInsets.only(bottom: 15, top: 4),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      "Add Exercise"
-                          .text
-                          .color(Pallete.primaryColor)
-                          .makeCentered()
-                          .box
-                          .rounded
-                          .color(Pallete.surfaceColor2)
-                          .width(width * 0.4)
-                          .margin(EdgeInsets.only(top: height * 0.015))
-                          .height(height * 0.06)
-                          .border(color: Pallete.primaryColor)
-                          .makeCentered()
-                          .onInkTap(() {
-                        _onTapAddExercise();
-                      }),
-                      // if (exerciseList.length > 1)
-                      ("Save Workout"
-                          .text
-                          .color(Pallete.surfaceColor)
-                          .makeCentered()
-                          .box
-                          .rounded
-                          .color(Pallete.primaryColor)
-                          .width(width * 0.4)
-                          .margin(EdgeInsets.only(top: height * 0.015))
-                          .height(height * 0.06)
-                          .border(color: Pallete.primaryColor)
-                          .makeCentered()
-                          .onInkTap(() {
-                        _onTapSave(context);
-                      }))
-                    ],
-                  ),
-                )
-              ],
+                  )
+                ],
+              ),
             ),
           ),
         ),

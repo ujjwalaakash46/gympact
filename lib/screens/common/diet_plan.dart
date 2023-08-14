@@ -51,54 +51,24 @@ class _DietPlanState extends ConsumerState<DietPlan> {
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.all(8.0),
         child: SafeArea(
-          child: Center(
-            child: Column(
-              children: [
-                Container(
-                  // margin: const EdgeInsets.only(top: 0),
-                  width: width * 0.85,
-                  child: "Diet Plan"
-                      .text
-                      .size(24)
-                      .fontFamily("Montserrat")
-                      .fontWeight(FontWeight.w900)
-                      .make(),
-                ),
-                SizedBox(
-                  height: height * 0.03,
-                ),
-                Container(
-                  width: width * 0.85,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  margin: const EdgeInsets.symmetric(vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Pallete.surfaceColor2,
-                    borderRadius: BorderRadius.circular(15),
+          child: GestureDetector(
+            onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+            child: Center(
+              child: Column(
+                children: [
+                  Container(
+                    // margin: const EdgeInsets.only(top: 0),
+                    width: width * 0.85,
+                    child: "Diet Plan"
+                        .text
+                        .size(24)
+                        .fontFamily("Montserrat")
+                        .fontWeight(FontWeight.w900)
+                        .make(),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      "Protine".text.size(16).lineHeight(1.4).make(),
-                      Container(
-                        height: height * 0.055,
-                        width: width * 0.3,
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          // color: Pallete.surfaceColor4,
-                          border: Border.all(color: Pallete.whiteColor),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: ("${diet.protine} gm")
-                            .text
-                            .size(14)
-                            .color(Pallete.primaryColor)
-                            .makeCentered(),
-                      )
-                    ],
+                  SizedBox(
+                    height: height * 0.03,
                   ),
-                ),
-                if (diet.calIntake != null)
                   Container(
                     width: width * 0.85,
                     padding:
@@ -111,7 +81,7 @@ class _DietPlanState extends ConsumerState<DietPlan> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        "Calorie Intake".text.size(16).lineHeight(1.4).make(),
+                        "Protine".text.size(16).lineHeight(1.4).make(),
                         Container(
                           height: height * 0.055,
                           width: width * 0.3,
@@ -121,7 +91,7 @@ class _DietPlanState extends ConsumerState<DietPlan> {
                             border: Border.all(color: Pallete.whiteColor),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: ("${diet.calIntake ?? "-"} cal")
+                          child: ("${diet.protine} gm")
                               .text
                               .size(14)
                               .color(Pallete.primaryColor)
@@ -130,93 +100,126 @@ class _DietPlanState extends ConsumerState<DietPlan> {
                       ],
                     ),
                   ),
-                if (diet.waterIntake != null)
+                  if (diet.calIntake != null)
+                    Container(
+                      width: width * 0.85,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Pallete.surfaceColor2,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          "Calorie Intake".text.size(16).lineHeight(1.4).make(),
+                          Container(
+                            height: height * 0.055,
+                            width: width * 0.3,
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              // color: Pallete.surfaceColor4,
+                              border: Border.all(color: Pallete.whiteColor),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: ("${diet.calIntake ?? "-"} cal")
+                                .text
+                                .size(14)
+                                .color(Pallete.primaryColor)
+                                .makeCentered(),
+                          )
+                        ],
+                      ),
+                    ),
+                  if (diet.waterIntake != null)
+                    Container(
+                      width: width * 0.85,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Pallete.surfaceColor2,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          "Water Intake".text.size(16).lineHeight(1.4).make(),
+                          Container(
+                            height: height * 0.055,
+                            width: width * 0.3,
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              // color: Pallete.surfaceColor4,
+                              border: Border.all(color: Pallete.whiteColor),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: ("${diet.waterIntake ?? "-"} L")
+                                .text
+                                .size(14)
+                                .color(Pallete.primaryColor)
+                                .makeCentered(),
+                          )
+                        ],
+                      ),
+                    ),
+                  if (diet.calToBurn != null)
+                    Container(
+                      width: width * 0.85,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Pallete.surfaceColor2,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          "Calorie Burn".text.size(16).lineHeight(1.4).make(),
+                          Container(
+                            height: height * 0.055,
+                            width: width * 0.3,
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              // color: Pallete.surfaceColor4,
+                              border: Border.all(color: Pallete.whiteColor),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: ("${diet.calToBurn ?? "-"} cal")
+                                .text
+                                .size(14)
+                                .color(Pallete.primaryColor)
+                                .makeCentered(),
+                          )
+                        ],
+                      ),
+                    ),
                   Container(
                     width: width * 0.85,
+                    margin: const EdgeInsets.symmetric(vertical: 16),
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    margin: const EdgeInsets.symmetric(vertical: 4),
                     decoration: BoxDecoration(
-                      color: Pallete.surfaceColor2,
+                      color: Pallete.surfaceColor,
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        "Water Intake".text.size(16).lineHeight(1.4).make(),
-                        Container(
-                          height: height * 0.055,
-                          width: width * 0.3,
-                          padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            // color: Pallete.surfaceColor4,
-                            border: Border.all(color: Pallete.whiteColor),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: ("${diet.waterIntake ?? "-"} L")
-                              .text
-                              .size(14)
-                              .color(Pallete.primaryColor)
-                              .makeCentered(),
-                        )
+                        "Note".text.size(20).make(),
+                        diet.note.text
+                            .make()
+                            .box
+                            .margin(const EdgeInsets.only(top: 8, bottom: 8))
+                            // .padding(EdgeInsets.only(top: 8))
+                            .make()
                       ],
                     ),
                   ),
-                if (diet.calToBurn != null)
-                  Container(
-                    width: width * 0.85,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Pallete.surfaceColor2,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        "Calorie Burn".text.size(16).lineHeight(1.4).make(),
-                        Container(
-                          height: height * 0.055,
-                          width: width * 0.3,
-                          padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            // color: Pallete.surfaceColor4,
-                            border: Border.all(color: Pallete.whiteColor),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: ("${diet.calToBurn ?? "-"} cal")
-                              .text
-                              .size(14)
-                              .color(Pallete.primaryColor)
-                              .makeCentered(),
-                        )
-                      ],
-                    ),
-                  ),
-                Container(
-                  width: width * 0.85,
-                  margin: const EdgeInsets.symmetric(vertical: 16),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Pallete.surfaceColor,
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      "Note".text.size(20).make(),
-                      diet.note.text
-                          .make()
-                          .box
-                          .margin(const EdgeInsets.only(top: 8, bottom: 8))
-                          // .padding(EdgeInsets.only(top: 8))
-                          .make()
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

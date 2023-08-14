@@ -60,11 +60,17 @@ class _UserHomeState extends ConsumerState<UserHome> {
     packages: [],
     groups: [],
   );
+  String greeting = "Good Morning";
 
   fetchDetails() async {
     user = ref.read(userProvider.notifier).get()!;
     gym = ref.read(gymProvider.notifier).get()!;
     ref.read(homeMessageProvider.notifier).fetchMessages(user.id!);
+    DateTime currentTime = DateTime.now();
+    int currentHour = currentTime.hour;
+    if (currentHour >= 16) {
+      greeting = "Good Evening";
+    }
   }
 
   @override
@@ -98,7 +104,7 @@ class _UserHomeState extends ConsumerState<UserHome> {
     } catch (e) {
       print(e);
     }
-
+    final imgIndex = Random().nextInt(4) + 1;
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.all(8.0),
@@ -124,8 +130,7 @@ class _UserHomeState extends ConsumerState<UserHome> {
                   ],
                 ),
               ),
-              "Good Morning"
-                  .richText
+              greeting.richText
                   .color(Pallete.secondaryColor)
                   .size(16)
                   .make()
@@ -162,21 +167,44 @@ class _UserHomeState extends ConsumerState<UserHome> {
               SizedBox(
                 height: height * 0.03,
               ),
-              message.text
-                  .lineHeight(1.7)
-                  .center
-                  .make()
+              Row(
+                children: [
+                  Image.asset(
+                    "assets/images/lion$imgIndex.png",
+                    fit: BoxFit.contain,
+                  ),
+                  SizedBox(
+                      width: width * 0.5,
+                      child: ("\"" + message + "\"")
+                          .text
+                          .size(16)
+                          .lineHeight(1.7)
+                          .center
+                          .make())
+                ],
+              )
                   .box
-                  .border(
-                      style: BorderStyle.solid,
-                      color: Pallete.primaryFade,
-                      width: 1.5)
                   .rounded
                   .color(Pallete.surfaceColor)
-                  .padding(EdgeInsets.all(12))
+                  // .padding(EdgeInsets.all(12))
                   .height(height * 0.15)
                   .width(width * 0.85)
                   .makeCentered(),
+              // message.text
+              //     .lineHeight(1.7)
+              //     .center
+              //     .make()
+              //     .box
+              //     // .border(
+              //     //     style: BorderStyle.solid,
+              //     //     // color: Pallete.primaryFade,
+              //     //     width: 1.5)
+              //     .rounded
+              //     .color(Pallete.surfaceColor)
+              //     .padding(EdgeInsets.all(12))
+              //     .height(height * 0.15)
+              //     .width(width * 0.85)
+              //     .makeCentered(),
               HStack(
                 [
                   "Mark Attendance"

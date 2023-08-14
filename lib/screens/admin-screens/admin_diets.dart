@@ -239,163 +239,166 @@ class _AdminDietsState extends ConsumerState<AdminDiets> {
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.all(8.0),
         child: SafeArea(
-          child: Center(
-            child: Column(
-              children: [
-                if (!addNewDiet) ...[
-                  Container(
-                    margin: const EdgeInsets.only(),
-                    width: width * 0.85,
-                    child: "Diets"
-                        .text
-                        .size(24)
-                        .fontFamily("Montserrat")
-                        .fontWeight(FontWeight.w900)
-                        .make(),
-                  ),
-                  SizedBox(
-                    height: height * 0.03,
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 6),
-                    padding: const EdgeInsets.all(12),
-                    height: height * 0.065,
-                    width: width * 0.7,
-                    decoration: BoxDecoration(
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color.fromARGB(66, 14, 14, 14),
-                            offset: Offset(
-                              0,
-                              4.0,
-                            ),
-                            blurRadius: 9.0,
-                            spreadRadius: 2.0,
-                          ),
-                        ],
-                        color: Pallete.surfaceColor,
-                        border: Border.all(
-                          style: BorderStyle.solid,
-                          color: Pallete.primaryFade,
-                          width: 1.5,
-                        ),
-                        borderRadius: BorderRadius.circular(15)),
-                    child: Center(
-                      child: "Add New Diet"
-                          .text
-                          .color(Pallete.primaryFade2)
-                          .makeCentered(),
-                    ),
-                  ).onTap(() {
-                    setState(() {
-                      addNewDiet = true;
-                    });
-                  }),
-                  SizedBox(
-                    height: height * 0.02,
-                  ),
-                  if (diets.isEmpty)
-                    "No diet plan added"
-                        .text
-                        .color(Pallete.whiteDarkColor)
-                        .make()
-                        .box
-                        .margin(EdgeInsets.symmetric(vertical: height * 0.02))
-                        .make(),
-                  ...diets.mapIndexed((diet, i) {
-                    return Container(
-                      decoration: BoxDecoration(
-                          color: Pallete.surfaceColor,
-                          borderRadius: BorderRadius.circular(15)),
-                      margin: const EdgeInsets.only(bottom: 6),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 12),
-                      // height: height * 0.1,
+          child: GestureDetector(
+            onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+            child: Center(
+              child: Column(
+                children: [
+                  if (!addNewDiet) ...[
+                    Container(
+                      margin: const EdgeInsets.only(),
                       width: width * 0.85,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            child: (diet.name).text.size(14).make(),
+                      child: "Diets"
+                          .text
+                          .size(24)
+                          .fontFamily("Montserrat")
+                          .fontWeight(FontWeight.w900)
+                          .make(),
+                    ),
+                    SizedBox(
+                      height: height * 0.03,
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 6),
+                      padding: const EdgeInsets.all(12),
+                      height: height * 0.065,
+                      width: width * 0.7,
+                      decoration: BoxDecoration(
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color.fromARGB(66, 14, 14, 14),
+                              offset: Offset(
+                                0,
+                                4.0,
+                              ),
+                              blurRadius: 9.0,
+                              spreadRadius: 2.0,
+                            ),
+                          ],
+                          color: Pallete.surfaceColor,
+                          border: Border.all(
+                            style: BorderStyle.solid,
+                            color: Pallete.primaryFade,
+                            width: 1.5,
                           ),
-                          SizedBox(
-                            height: height * 0.02,
-                          ),
-                          Row(
-                            children: [
-                              Container(
-                                  padding:
-                                      const EdgeInsets.only(left: 8, right: 20),
-                                  decoration: const BoxDecoration(
-                                    border: Border(
-                                      left: BorderSide(
-                                          width: 2,
-                                          color: Pallete.primaryColor),
-                                    ),
-                                  ),
-                                  child: ("${diet.protine} g")
-                                      .text
-                                      .color(Pallete.whiteDarkColor)
-                                      .size(12)
-                                      .make()),
-                              if (diet.waterIntake != null)
-                                Container(
-                                    padding: const EdgeInsets.only(
-                                        left: 8, right: 20),
-                                    decoration: const BoxDecoration(
-                                      border: Border(
-                                        left: BorderSide(
-                                            width: 2,
-                                            color: Pallete.primaryColor),
-                                      ),
-                                    ),
-                                    child: ("${diet.waterIntake} L")
-                                        .text
-                                        .color(Pallete.whiteDarkColor)
-                                        .size(12)
-                                        .make()),
-                              if (diet.calIntake != null)
-                                Container(
-                                    padding: const EdgeInsets.only(
-                                        left: 8, right: 20),
-                                    decoration: const BoxDecoration(
-                                      border: Border(
-                                        left: BorderSide(
-                                            width: 2,
-                                            color: Pallete.primaryColor),
-                                      ),
-                                    ),
-                                    child: ("${diet.calIntake} cal")
-                                        .text
-                                        .color(Pallete.whiteDarkColor)
-                                        .size(12)
-                                        .make()),
-                            ],
-                          ),
-                          if (dietDetailsIndex == i)
-                            Container(
-                              padding: EdgeInsets.all(4),
-                              margin: EdgeInsets.symmetric(
-                                  horizontal: 4, vertical: 12),
-                              child: diet.note.text.make(),
-                            )
-                        ],
+                          borderRadius: BorderRadius.circular(15)),
+                      child: Center(
+                        child: "Add New Diet"
+                            .text
+                            .color(Pallete.primaryFade2)
+                            .makeCentered(),
                       ),
-                    ).onInkTap(() {
+                    ).onTap(() {
                       setState(() {
-                        // isViewDiet = !isViewDiet;
-                        if (dietDetailsIndex == i) {
-                          dietDetailsIndex = -1;
-                        } else {
-                          dietDetailsIndex = i;
-                        }
+                        addNewDiet = true;
                       });
-                    });
-                  }),
+                    }),
+                    SizedBox(
+                      height: height * 0.02,
+                    ),
+                    if (diets.isEmpty)
+                      "No diet plan added"
+                          .text
+                          .color(Pallete.whiteDarkColor)
+                          .make()
+                          .box
+                          .margin(EdgeInsets.symmetric(vertical: height * 0.02))
+                          .make(),
+                    ...diets.mapIndexed((diet, i) {
+                      return Container(
+                        decoration: BoxDecoration(
+                            color: Pallete.surfaceColor,
+                            borderRadius: BorderRadius.circular(15)),
+                        margin: const EdgeInsets.only(bottom: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
+                        // height: height * 0.1,
+                        width: width * 0.85,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              child: (diet.name).text.size(14).make(),
+                            ),
+                            SizedBox(
+                              height: height * 0.02,
+                            ),
+                            Row(
+                              children: [
+                                Container(
+                                    padding: const EdgeInsets.only(
+                                        left: 8, right: 20),
+                                    decoration: const BoxDecoration(
+                                      border: Border(
+                                        left: BorderSide(
+                                            width: 2,
+                                            color: Pallete.primaryColor),
+                                      ),
+                                    ),
+                                    child: ("${diet.protine} g")
+                                        .text
+                                        .color(Pallete.whiteDarkColor)
+                                        .size(12)
+                                        .make()),
+                                if (diet.waterIntake != null)
+                                  Container(
+                                      padding: const EdgeInsets.only(
+                                          left: 8, right: 20),
+                                      decoration: const BoxDecoration(
+                                        border: Border(
+                                          left: BorderSide(
+                                              width: 2,
+                                              color: Pallete.primaryColor),
+                                        ),
+                                      ),
+                                      child: ("${diet.waterIntake} L")
+                                          .text
+                                          .color(Pallete.whiteDarkColor)
+                                          .size(12)
+                                          .make()),
+                                if (diet.calIntake != null)
+                                  Container(
+                                      padding: const EdgeInsets.only(
+                                          left: 8, right: 20),
+                                      decoration: const BoxDecoration(
+                                        border: Border(
+                                          left: BorderSide(
+                                              width: 2,
+                                              color: Pallete.primaryColor),
+                                        ),
+                                      ),
+                                      child: ("${diet.calIntake} cal")
+                                          .text
+                                          .color(Pallete.whiteDarkColor)
+                                          .size(12)
+                                          .make()),
+                              ],
+                            ),
+                            if (dietDetailsIndex == i)
+                              Container(
+                                padding: EdgeInsets.all(4),
+                                margin: EdgeInsets.symmetric(
+                                    horizontal: 4, vertical: 12),
+                                child: diet.note.text.make(),
+                              )
+                          ],
+                        ),
+                      ).onInkTap(() {
+                        setState(() {
+                          // isViewDiet = !isViewDiet;
+                          if (dietDetailsIndex == i) {
+                            dietDetailsIndex = -1;
+                          } else {
+                            dietDetailsIndex = i;
+                          }
+                        });
+                      });
+                    }),
+                  ],
+                  if (addNewDiet) _addNewDiet(context)
                 ],
-                if (addNewDiet) _addNewDiet(context)
-              ],
+              ),
             ),
           ),
         ),

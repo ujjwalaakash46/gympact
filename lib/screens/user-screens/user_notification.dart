@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gympact/models/group.dart';
 import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 
@@ -74,7 +75,7 @@ class UserNotification extends ConsumerStatefulWidget {
 }
 
 class _UserNotificationState extends ConsumerState<UserNotification> {
-  var notificationList = [];
+  List<Message> notificationList = [];
   var showAllStreakList = false;
   List<User> streakList = [];
 
@@ -120,12 +121,13 @@ class _UserNotificationState extends ConsumerState<UserNotification> {
       currentMonth = DateFormat('MMMM').format(DateTime.now());
     });
     final gymId = ref.read(gymProvider)?.id;
+    final userId = ref.read(userProvider)?.id;
+    ref.read(notificationProvider.notifier).fetchNotification(userId!);
     final responseStreak = await UserService().thisMonthStreakList(gymId!);
     final responseAchiever = await UserService().highAchieverList(gymId);
     if (responseStreak.statusCode == 200 &&
         responseAchiever.statusCode == 200) {
       setState(() {
-        print(responseStreak.body);
         streakList = List<User>.from(
             (json.decode(responseStreak.body) as List<dynamic>)
                 .map((e) => User.fromMap(e))

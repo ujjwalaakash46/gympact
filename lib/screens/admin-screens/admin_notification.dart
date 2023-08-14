@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/common/widgets/text_field.dart';
@@ -11,6 +13,9 @@ import 'package:gympact/models/gym.dart';
 import 'package:gympact/models/package.dart';
 import 'package:gympact/models/user.dart';
 import 'package:gympact/models/workout.dart';
+import 'package:gympact/provider/gym_state.dart';
+import 'package:gympact/service/gym_service.dart';
+import 'package:gympact/service/user_service.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:search_choices/search_choices.dart';
 
@@ -30,169 +35,20 @@ class _AdminNotificationState extends ConsumerState<AdminNotification> {
     workouts: [],
     diets: [],
     packages: [],
-    groups: [
-      Group(
-          id: 12,
-          gymId: 122,
-          name: "Beginner",
-          totalMembers: 142,
-          members: [],
-          messages: []),
-      Group(
-          id: 12,
-          gymId: 122,
-          name: "Moring Batch",
-          totalMembers: 103,
-          members: [],
-          messages: []),
-      Group(
-          id: 12,
-          gymId: 122,
-          name: "Evening Batch",
-          totalMembers: 122,
-          members: [],
-          messages: []),
-      Group(
-          id: 12,
-          gymId: 122,
-          name: "PT Batch",
-          totalMembers: 25,
-          members: [],
-          messages: [])
-    ],
+    groups: [],
   );
 
   int showMessageIndex = -1;
   int showAddMemberIndex = -1;
+  int selectedGroupId = -1;
   bool showCreateNewGroup = false;
+
+  bool messageSent = false;
 
   TextEditingController messageController = TextEditingController();
   TextEditingController groupNameController = TextEditingController();
-
-  List<User> members = [
-    User(
-        gender: "male",
-        id: 12,
-        coin: 1004,
-        level: 5,
-        gymId: "007",
-        name: "Aman Gupta",
-        phone: "123",
-        email: "amangupta@gh",
-        password: "password",
-        badgesList: [],
-        workoutList: [
-          Workout(
-              id: 21,
-              name: "Push",
-              discription: "desisis",
-              note: "note sdf",
-              createdDate: DateTime(2023),
-              updatedDate: DateTime(2023),
-              exercises: [
-                Exercise(23, "bell", "note", 3, 12, 10),
-                Exercise(24, "push ups", "note", 3, 20, 0),
-                Exercise(23, "row", "note", 3, 12, 20),
-                Exercise(23, "bench", "note", 3, 12, 20),
-                Exercise(23, "extension", "note", 3, 12, 20),
-              ],
-              durationInMin: 24),
-        ],
-        pastWorkoutList: [],
-        diet: Diet(
-            id: 1,
-            name: "High",
-            note:
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-            protine: 100,
-            waterIntake: "4",
-            calToBurn: "1500"),
-        progress: null,
-        weight: 65,
-        heigth: 165,
-        goal: "Gain Weight",
-        currentPackage: CurrentPackage(
-            id: 2,
-            package: Package(
-                id: 1,
-                price: 600,
-                durationInMonths: 3,
-                name: "3 Month Power Plan",
-                benefits: ["rt", "as", "asd"]),
-            startDate: DateTime.now(),
-            endDate: DateTime.now().add(const Duration(days: 90))),
-        dob: DateTime(1999, 8, 1),
-        joinOn: DateTime.now(),
-        lastVisit: DateTime.now(),
-        progressList: [],
-        role: Role.member),
-    User(
-        gender: "male",
-        id: 12,
-        coin: 1004,
-        level: 5,
-        gymId: "007",
-        name: "Aman Gupta",
-        phone: "123",
-        email: "amangupta@gh",
-        password: "password",
-        badgesList: [],
-        workoutList: [],
-        pastWorkoutList: [],
-        diet: null,
-        progress: null,
-        weight: 65,
-        heigth: 165,
-        goal: "To get fitter",
-        currentPackage: CurrentPackage(
-            id: 2,
-            package: Package(
-                id: 1,
-                price: 600,
-                durationInMonths: 3,
-                name: "3 Month Power Plan",
-                benefits: ["rt", "as", "asd"]),
-            startDate: DateTime.now(),
-            endDate: DateTime.now().add(const Duration(days: 90))),
-        dob: DateTime(1999, 8, 1),
-        joinOn: DateTime.now(),
-        lastVisit: DateTime.now(),
-        progressList: [],
-        role: Role.member),
-    User(
-        gender: "male",
-        id: 12,
-        coin: 1004,
-        level: 5,
-        gymId: "007",
-        name: "Aman Gupta",
-        phone: "123",
-        email: "amangupta@gh",
-        password: "password",
-        badgesList: [],
-        workoutList: [],
-        pastWorkoutList: [],
-        diet: null,
-        progress: null,
-        weight: 65,
-        heigth: 165,
-        goal: "To get fitter",
-        currentPackage: CurrentPackage(
-            id: 2,
-            package: Package(
-                id: 1,
-                price: 600,
-                durationInMonths: 3,
-                name: "3 Month Power Plan",
-                benefits: ["rt", "as", "asd"]),
-            startDate: DateTime.now(),
-            endDate: DateTime.now().add(const Duration(days: 90))),
-        dob: DateTime(1999, 8, 1),
-        joinOn: DateTime.now(),
-        lastVisit: DateTime.now(),
-        progressList: [],
-        role: Role.member),
-  ];
+  List<Group> groups = [];
+  List<User> members = [];
   User? addUser;
   searchMember(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -291,11 +147,38 @@ class _AdminNotificationState extends ConsumerState<AdminNotification> {
             addUser = null;
           });
           //Add Member
-          print(value);
+          addMember(value);
         },
         value: addUser,
       ),
     );
+  }
+
+  addMember(User u) async {
+    if (selectedGroupId != -1) {
+      final response = await GymService().addMember(selectedGroupId, u.id!);
+      if (response.statusCode == 200) {
+        fetchGroups();
+      }
+    }
+  }
+
+  sendMessage(String message) async {
+    if (message.isNotEmpty) {
+      Message m = Message(createdOn: DateTime.now(), data: message);
+      final response = await GymService().notifyGroup(selectedGroupId, m);
+      if (response.statusCode == 200) {
+        setState(() {
+          messageSent = true;
+        });
+        print(messageSent);
+        Future.delayed(Duration(seconds: 5)).then((value) {
+          setState(() {
+            messageSent = false;
+          });
+        });
+      }
+    }
   }
 
   createNewGroup(BuildContext context) {
@@ -365,8 +248,8 @@ class _AdminNotificationState extends ConsumerState<AdminNotification> {
                   .makeCentered()
                   .onInkTap(() {
                 setState(() {
-                  groupNameController.text = "";
                   showCreateNewGroup = false;
+                  saveNewGroup();
                 });
 
                 //Creaete new group
@@ -376,6 +259,50 @@ class _AdminNotificationState extends ConsumerState<AdminNotification> {
         ],
       ),
     );
+  }
+
+  fetchGroups() async {
+    final gymId = ref.read(gymProvider)?.id;
+    final response = await GymService().getGroups(gymId!);
+    if (response.statusCode == 200) {
+      final list = List<Group>.from(
+          (json.decode(response.body) as List<dynamic>)
+              .map((e) => Group.fromMap(e as Map<String, dynamic>))
+              .toList());
+      setState(() {
+        print(list);
+        groups = list;
+      });
+    }
+
+    final responseUserList = await UserService().searchUser(gymId, "");
+    if (response.statusCode == 200) {
+      final list = List<User>.from(
+          (json.decode(responseUserList.body) as List<dynamic>)
+              .map((e) => User.fromMap(e as Map<String, dynamic>))
+              .toList());
+      setState(() {
+        members = list;
+      });
+    }
+  }
+
+  saveNewGroup() async {
+    if (groupNameController.text.isNotEmpty) {
+      final gymId = ref.read(gymProvider)?.id;
+      final response =
+          await GymService().createGroup(gymId!, groupNameController.text);
+      if (response.statusCode == 200) {
+        fetchGroups();
+      }
+      groupNameController.text = "";
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchGroups();
   }
 
   @override
@@ -392,197 +319,215 @@ class _AdminNotificationState extends ConsumerState<AdminNotification> {
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.all(8.0),
       child: SafeArea(
-        child: Center(
-          child: Column(
-            children: [
-              Container(
-                margin: const EdgeInsets.only(top: 8),
-                width: width * 0.85,
-                child: "Notify"
-                    .text
-                    .size(24)
-                    .fontFamily("Montserrat")
-                    .fontWeight(FontWeight.w900)
-                    .make(),
-              ),
-              SizedBox(
-                height: height * 0.03,
-              ),
-              ...(gym.groups ?? []).mapIndexed(
-                (e, index) => Container(
-                  width: width * 0.85,
-                  padding: const EdgeInsets.only(
-                      top: 12, bottom: 12, left: 20, right: 12),
-                  margin: const EdgeInsets.only(
-                    top: 4,
-                    bottom: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Pallete.surfaceColor2,
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            flex: 2,
-                            child: e.name.text
-                                .size(18)
-                                .make()
-                                .box
-                                .margin(EdgeInsets.only(bottom: 4))
-                                .make(),
-                          ),
-
-                          //Imp! don't delete
-
-                          // "See Members"
-                          //     .text
-                          //     .color(Pallete.primaryColor)
-                          //     .size(12)
-                          //     .makeCentered()
-                          //     .box
-                          //     .padding(const EdgeInsets.all(8))
-                          //     .rounded
-                          //     .border(
-                          //       color: Pallete.surfaceColor4,
-                          //       width: 0.8,
-                          //     )
-                          //     .make()
-                          //     .onInkTap(() {})
-                        ],
-                      ),
-                      SizedBox(
-                        height: height * 0.005,
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                              flex: 2,
-                              child: Row(
-                                children: [
-                                  "Members  ".text.make(),
-                                  "${e.totalMembers}"
-                                      .text
-                                      .color(Pallete.primaryColor)
-                                      .make(),
-                                ],
-                              )),
-                          IconButton(
-                            onPressed: () {
-                              setState(() {
-                                if (showAddMemberIndex == index) {
-                                  showAddMemberIndex = -1;
-                                } else {
-                                  showAddMemberIndex = index;
-                                }
-                                showMessageIndex = -1;
-                              });
-                            },
-                            icon: const Icon(
-                              Icons.person_add_alt_1_rounded,
-                              color: Pallete.whiteColor,
-                              size: 28,
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              setState(() {
-                                if (showMessageIndex == index) {
-                                  showMessageIndex = -1;
-                                } else {
-                                  showMessageIndex = index;
-                                }
-                                showAddMemberIndex = -1;
-                                messageController.text = "";
-                              });
-                            },
-                            icon: const Icon(
-                              Icons.message_rounded,
-                              color: Pallete.primaryColor,
-                              size: 28,
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (index == showMessageIndex)
-                        Container(
-                          margin: EdgeInsets.only(top: height * 0.005),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                  flex: 2,
-                                  child: InputTextField(
-                                      fillColor: Pallete.surfaceColor,
-                                      label: "Message",
-                                      controller: messageController,
-                                      type: TextInputType.multiline)),
-                              IconButton(
-                                onPressed: () {
-                                  print(messageController.text);
-
-                                  //send message!!
-                                  setState(() {
-                                    showMessageIndex = -1;
-                                    messageController.text = "";
-                                  });
-                                },
-                                icon: const Icon(
-                                  Icons.send_rounded,
-                                  color: Pallete.whiteColor,
-                                  size: 28,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      if (showAddMemberIndex == index) searchMember(context)
-                    ],
-                  ),
-                ),
-              ),
-              if (!showCreateNewGroup)
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+          child: Center(
+            child: Column(
+              children: [
                 Container(
-                  margin: const EdgeInsets.only(top: 16),
-                  padding: const EdgeInsets.all(12),
-                  height: height * 0.065,
-                  width: width * 0.7,
-                  decoration: BoxDecoration(
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color.fromARGB(66, 14, 14, 14),
-                          offset: Offset(
-                            0,
-                            4.0,
-                          ),
-                          blurRadius: 9.0,
-                          spreadRadius: 2.0,
-                        ),
-                      ],
-                      color: Pallete.primaryDarkFade2,
-                      border: Border.all(
-                        style: BorderStyle.solid,
-                        color: Pallete.primaryFade,
-                        width: 1.5,
-                      ),
-                      borderRadius: BorderRadius.circular(15)),
-                  child: Center(
-                      child: "Create New Group"
-                          .text
-                          .color(Pallete.primaryFade2)
-                          .makeCentered()
-                          .box
-                          .make()
-                          .onInkTap(() {
-                    setState(() {
-                      showCreateNewGroup = true;
-                    });
-                  })),
+                  margin: const EdgeInsets.only(top: 8),
+                  width: width * 0.85,
+                  child: "Notify"
+                      .text
+                      .size(24)
+                      .fontFamily("Montserrat")
+                      .fontWeight(FontWeight.w900)
+                      .make(),
                 ),
-              if (showCreateNewGroup) createNewGroup(context)
-            ],
+                SizedBox(
+                  height: height * 0.03,
+                ),
+                ...(groups).mapIndexed(
+                  (e, index) => Container(
+                    width: width * 0.85,
+                    padding: const EdgeInsets.only(
+                        top: 12, bottom: 12, left: 20, right: 12),
+                    margin: const EdgeInsets.only(
+                      top: 4,
+                      bottom: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Pallete.surfaceColor2,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: e.name.text
+                                  .size(18)
+                                  .make()
+                                  .box
+                                  .margin(EdgeInsets.only(bottom: 4))
+                                  .make(),
+                            ),
+
+                            //Imp! don't delete
+
+                            // "See Members"
+                            //     .text
+                            //     .color(Pallete.primaryColor)
+                            //     .size(12)
+                            //     .makeCentered()
+                            //     .box
+                            //     .padding(const EdgeInsets.all(8))
+                            //     .rounded
+                            //     .border(
+                            //       color: Pallete.surfaceColor4,
+                            //       width: 0.8,
+                            //     )
+                            //     .make()
+                            //     .onInkTap(() {})
+                          ],
+                        ),
+                        SizedBox(
+                          height: height * 0.005,
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                                flex: 2,
+                                child: Row(
+                                  children: [
+                                    "Members  ".text.make(),
+                                    "${e.members.length}"
+                                        .text
+                                        .color(Pallete.primaryColor)
+                                        .make(),
+                                  ],
+                                )),
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  selectedGroupId = e.id!;
+                                  if (showAddMemberIndex == index) {
+                                    showAddMemberIndex = -1;
+                                  } else {
+                                    showAddMemberIndex = index;
+                                  }
+                                  showMessageIndex = -1;
+                                });
+                              },
+                              icon: const Icon(
+                                Icons.person_add_alt_1_rounded,
+                                color: Pallete.whiteColor,
+                                size: 28,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  if (showMessageIndex == index) {
+                                    showMessageIndex = -1;
+                                  } else {
+                                    showMessageIndex = index;
+                                  }
+                                  showAddMemberIndex = -1;
+                                  messageController.text = "";
+                                });
+                              },
+                              icon: const Icon(
+                                Icons.message_rounded,
+                                color: Pallete.primaryColor,
+                                size: 28,
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (index == showMessageIndex)
+                          Container(
+                            margin: EdgeInsets.only(top: height * 0.005),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                        flex: 2,
+                                        child: InputTextField(
+                                            fillColor: Pallete.surfaceColor,
+                                            label: "Message",
+                                            controller: messageController,
+                                            type: TextInputType.multiline)),
+                                    IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedGroupId = e.id!;
+                                        });
+                                        print(e.id);
+                                        print(selectedGroupId);
+                                        print(messageSent);
+                                        print(messageSent == true &&
+                                            selectedGroupId == e.id!);
+                                        //send message!!
+                                        sendMessage(messageController.text);
+                                        setState(() {
+                                          // showMessageIndex = -1;
+                                          messageController.text = "";
+                                        });
+                                      },
+                                      icon: const Icon(
+                                        Icons.send_rounded,
+                                        color: Pallete.whiteColor,
+                                        size: 28,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                if (messageSent == true &&
+                                    selectedGroupId == e.id!)
+                                  "Message Sent".text.make()
+                              ],
+                            ),
+                          ),
+                        if (showAddMemberIndex == index) searchMember(context)
+                      ],
+                    ),
+                  ),
+                ),
+                if (!showCreateNewGroup)
+                  Container(
+                    margin: const EdgeInsets.only(top: 16),
+                    padding: const EdgeInsets.all(12),
+                    height: height * 0.065,
+                    width: width * 0.7,
+                    decoration: BoxDecoration(
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color.fromARGB(66, 14, 14, 14),
+                            offset: Offset(
+                              0,
+                              4.0,
+                            ),
+                            blurRadius: 9.0,
+                            spreadRadius: 2.0,
+                          ),
+                        ],
+                        color: Pallete.primaryDarkFade2,
+                        border: Border.all(
+                          style: BorderStyle.solid,
+                          color: Pallete.primaryFade,
+                          width: 1.5,
+                        ),
+                        borderRadius: BorderRadius.circular(15)),
+                    child: Center(
+                        child: "Create New Group"
+                            .text
+                            .color(Pallete.primaryFade2)
+                            .makeCentered()
+                            .box
+                            .make()
+                            .onInkTap(() {
+                      setState(() {
+                        showCreateNewGroup = true;
+                      });
+                    })),
+                  ),
+                if (showCreateNewGroup) createNewGroup(context)
+              ],
+            ),
           ),
         ),
       ),

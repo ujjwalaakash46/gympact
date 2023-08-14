@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/constants/colors.dart';
+import 'package:gympact/constants/constants.dart';
 import 'package:gympact/constants/enums.dart';
 import 'package:gympact/models/current_package.dart';
 import 'package:gympact/models/package.dart';
@@ -19,6 +20,8 @@ class AdminBirthday extends ConsumerStatefulWidget {
 }
 
 class _AdminBirthdayState extends ConsumerState<AdminBirthday> {
+  String imgUrl = Constant.imgUrl;
+
   List<User> birthdayList = [
     User(
         gender: "male",
@@ -248,8 +251,9 @@ class _AdminBirthdayState extends ConsumerState<AdminBirthday> {
                                                   ),
                                                   width: width * 0.15,
                                                   //change to network
-                                                  child: Image.asset(
-                                                    'assets/images/gym logo.png',
+                                                  child: Image.network(
+                                                    imgUrl +
+                                                        e.profileImg.toString(),
                                                     fit: BoxFit.contain,
                                                   ),
                                                 ),

@@ -45,6 +45,7 @@ class _UserSettingState extends ConsumerState<UserSetting> {
 
     final response = await UserService().updateUserData(gymId, user);
     if (response.statusCode == 200) {
+      ref.read(progressDetailsProvider.notifier).fetchProgress(user.id!);
       if (context.mounted) Navigator.of(context).pop();
     } else {
       setState(() {
@@ -108,74 +109,77 @@ class _UserSettingState extends ConsumerState<UserSetting> {
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.all(8.0),
           child: SafeArea(
-            child: Center(
-              child: Container(
-                width: width * 0.85,
-                child: Column(
-                  children: [
-                    InputTextField(
-                      label: "Email",
-                      hint: "email",
-                      hide: false,
-                      controller: emailController,
-                      type: TextInputType.emailAddress,
-                    ),
-                    SizedBox(
-                      height: height * 0.01,
-                    ),
-                    InputTextField(
-                      label: "Password",
-                      hint: "Password",
-                      hide: false,
-                      controller: passwordController,
-                      type: TextInputType.visiblePassword,
-                    ),
-                    SizedBox(
-                      height: height * 0.01,
-                    ),
-                    InputTextField(
-                      label: "Weight",
-                      hint: "Weight",
-                      hide: false,
-                      controller: weightController,
-                      type: TextInputType.number,
-                    ),
-                    SizedBox(
-                      height: height * 0.01,
-                    ),
-                    InputTextField(
-                      label: "Height",
-                      hint: "Height",
-                      hide: false,
-                      controller: heightController,
-                      type: TextInputType.number,
-                    ),
-                    SizedBox(
-                      height: height * 0.02,
-                    ),
-                    if (error != "")
-                      "${error}".text.color(Pallete.primaryColor).make(),
-                    if (error != "")
-                      SizedBox(
-                        height: height * 0.03,
+            child: GestureDetector(
+              onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+              child: Center(
+                child: Container(
+                  width: width * 0.85,
+                  child: Column(
+                    children: [
+                      InputTextField(
+                        label: "Email",
+                        hint: "email",
+                        hide: false,
+                        controller: emailController,
+                        type: TextInputType.emailAddress,
                       ),
-                    Container(
-                      height: height * 0.05,
-                      width: width * 0.3,
-                      decoration: BoxDecoration(
-                          color: Pallete.primaryColor,
-                          borderRadius: BorderRadius.circular(15),
-                          border: Border.all(
-                              color: Pallete.primaryColor, width: 1.5)),
-                      child: "Save"
-                          .text
-                          .color(Pallete.surfaceColor)
-                          .size(14)
-                          .makeCentered(),
-                    ).onTap(() {
-                      saveData();
-                    }),
-                  ],
+                      SizedBox(
+                        height: height * 0.01,
+                      ),
+                      InputTextField(
+                        label: "Password",
+                        hint: "Password",
+                        hide: false,
+                        controller: passwordController,
+                        type: TextInputType.visiblePassword,
+                      ),
+                      SizedBox(
+                        height: height * 0.01,
+                      ),
+                      InputTextField(
+                        label: "Weight",
+                        hint: "Weight",
+                        hide: false,
+                        controller: weightController,
+                        type: TextInputType.number,
+                      ),
+                      SizedBox(
+                        height: height * 0.01,
+                      ),
+                      InputTextField(
+                        label: "Height",
+                        hint: "Height",
+                        hide: false,
+                        controller: heightController,
+                        type: TextInputType.number,
+                      ),
+                      SizedBox(
+                        height: height * 0.02,
+                      ),
+                      if (error != "")
+                        "${error}".text.color(Pallete.primaryColor).make(),
+                      if (error != "")
+                        SizedBox(
+                          height: height * 0.03,
+                        ),
+                      Container(
+                        height: height * 0.05,
+                        width: width * 0.3,
+                        decoration: BoxDecoration(
+                            color: Pallete.primaryColor,
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(
+                                color: Pallete.primaryColor, width: 1.5)),
+                        child: "Save"
+                            .text
+                            .color(Pallete.surfaceColor)
+                            .size(14)
+                            .makeCentered(),
+                      ).onTap(() {
+                        saveData();
+                      }),
+                    ],
+                  ),
                 ),
               ),
             ),

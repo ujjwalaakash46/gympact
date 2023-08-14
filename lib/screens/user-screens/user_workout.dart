@@ -282,6 +282,7 @@ class _UserWorkoutState extends ConsumerState<UserWorkout> {
 
         final response = await UserService().savePastWorkout(user.id!, p);
         if (response.statusCode == 200) {
+          ref.read(userProvider.notifier).fetchUserData();
           setState(() {
             error = "";
           });

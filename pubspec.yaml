@@ -1,5 +1,5 @@
 name: gympact
-description: A new Flutter project.
+description: Gympact.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -58,8 +58,11 @@ dependencies:
   dots_indicator: ^3.0.0
   dio: ^5.3.0
   http: ^1.1.0
+  url_launcher: ^6.1.12
+
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.13.1
   flutter_test:
     sdk: flutter
 
@@ -75,7 +78,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -87,6 +89,10 @@ flutter:
     - assets/images/prelogin1.jpg
     - assets/images/prelogin3.jpg
     - assets/images/prelogin5.jpg
+    - assets/images/lion1.png
+    - assets/images/lion2.png
+    - assets/images/lion3.png
+    - assets/images/lion4.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -116,3 +122,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/gympacticon.png"
+  adaptive_icon_foreground: "assets/images/1024.png"
+  adaptive_icon_background: "#ffffff"

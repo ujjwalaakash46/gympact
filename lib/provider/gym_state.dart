@@ -162,8 +162,9 @@ class BirthdayNotifier extends StateNotifier<List<User>> {
   List<User> get() => state;
 }
 
-final statisticProvider = StateNotifierProvider<StatisticNotifier, Map<String, dynamic>>(
-    (ref) => StatisticNotifier());
+final statisticProvider =
+    StateNotifierProvider<StatisticNotifier, Map<String, dynamic>>(
+        (ref) => StatisticNotifier());
 
 class StatisticNotifier extends StateNotifier<Map<String, dynamic>> {
   StatisticNotifier() : super({});
@@ -171,7 +172,7 @@ class StatisticNotifier extends StateNotifier<Map<String, dynamic>> {
   Future<Map<String, dynamic>> fetchStatistic(int gymId) async {
     final response = await GymService().statistic(gymId);
     if (response.statusCode == 200) {
-      Map<String, dynamic> map = 
+      Map<String, dynamic> map =
           (json.decode(response.body) as Map<String, dynamic>);
       state = map;
     }

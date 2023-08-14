@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/constants/colors.dart';
+import 'package:gympact/constants/constants.dart';
 import 'package:gympact/constants/enums.dart';
 import 'package:gympact/models/current_package.dart';
 import 'package:gympact/models/package.dart';
@@ -279,8 +280,9 @@ class _AdminPackagesState extends ConsumerState<AdminPackages> {
                                               ),
                                               width: width * 0.15,
                                               //change to network
-                                              child: Image.asset(
-                                                'assets/images/gym logo.png',
+                                              child: Image.network(
+                                                Constant.imgUrl +
+                                                    e.profileImg.toString(),
                                                 fit: BoxFit.contain,
                                               ),
                                             ),
@@ -483,8 +485,9 @@ class _AdminPackagesState extends ConsumerState<AdminPackages> {
                                               ),
                                               width: width * 0.15,
                                               //change to network
-                                              child: Image.asset(
-                                                'assets/images/gym logo.png',
+                                              child: Image.network(
+                                                Constant.imgUrl +
+                                                    e.profileImg.toString(),
                                                 fit: BoxFit.contain,
                                               ),
                                             ),

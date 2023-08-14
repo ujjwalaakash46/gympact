@@ -59,13 +59,13 @@ class _AddTodaysDetailsState extends ConsumerState<AddTodaysDetails> {
             ? null
             : double.parse(waterInTakeController.text));
 
-    // print(progress);
     final userId = ref.read(userProvider)?.id;
     await UserService().saveTodaysProgress(progress, userId!);
     ref.read(progressListProvider.notifier).fetchProgress(userId);
+    ref.read(progressDetailsProvider.notifier).fetchProgress(userId);
 
     if (context.mounted) Navigator.of(context).pop();
-    if (context.mounted) Navigator.of(context).pop();
+    // if (context.mounted) Navigator.of(context).pop();
   }
 
   saveAlert(BuildContext context) {
@@ -242,235 +242,242 @@ class _AddTodaysDetailsState extends ConsumerState<AddTodaysDetails> {
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.all(8.0),
           child: SafeArea(
-            child: Center(
-              child: Column(
-                children: [
-                  Container(
-                    // margin: const EdgeInsets.only(top: 0),
-                    width: width * 0.85,
-                    child: "Today's"
-                        .text
-                        .size(24)
-                        .fontFamily("Montserrat")
-                        .fontWeight(FontWeight.w900)
-                        .make(),
-                  ),
-                  SizedBox(
-                    height: height * 0.03,
-                  ),
-                  Container(
-                    width: width * 0.85,
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Pallete.surfaceColor,
-                      borderRadius: BorderRadius.circular(15),
+            child: GestureDetector(
+              onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+              child: Center(
+                child: Column(
+                  children: [
+                    Container(
+                      // margin: const EdgeInsets.only(top: 0),
+                      width: width * 0.85,
+                      child: "Today's"
+                          .text
+                          .size(24)
+                          .fontFamily("Montserrat")
+                          .fontWeight(FontWeight.w900)
+                          .make(),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      // crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // "Note".text.size(20).make(),
-                        Expanded(
-                          flex: 4,
-                          child: "Weigth"
-                              .text
-                              .make()
-                              .box
-                              .margin(const EdgeInsets.only(top: 8, bottom: 8))
-                              // .padding(EdgeInsets.only(top: 8))
-                              .make(),
-                        ),
-                        SizedBox(
-                          width: width * 0.25,
-                          height: height * 0.04,
-                          child: InputTextField(
-                            label: "",
-                            boardRadius: 14,
-                            fillColor: Pallete.surfaceColor3,
-                            hide: false,
-                            controller: weightController,
-                            type: TextInputType.number,
-                          ),
-                        ),
-                        "kg"
-                            .text
-                            .make()
-                            .box
-                            .width(width * 0.06)
-                            .margin(EdgeInsets.only(left: 4))
-                            .make()
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: width * 0.85,
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Pallete.surfaceColor,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      // crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // "Note".text.size(20).make(),
-                        Expanded(
-                          flex: 4,
-                          child: "Water consumed"
-                              .text
-                              .make()
-                              .box
-                              .margin(const EdgeInsets.only(top: 8, bottom: 8))
-                              // .padding(EdgeInsets.only(top: 8))
-                              .make(),
-                        ),
-                        SizedBox(
-                          width: width * 0.25,
-                          height: height * 0.04,
-                          child: InputTextField(
-                            label: "",
-                            boardRadius: 14,
-                            fillColor: Pallete.surfaceColor3,
-                            hide: false,
-                            controller: waterInTakeController,
-                            type: TextInputType.number,
-                          ),
-                        ),
-                        "L"
-                            .text
-                            .make()
-                            .box
-                            .width(width * 0.06)
-                            .margin(EdgeInsets.only(left: 4))
-                            .make()
-                      ],
-                    ),
-                  ),
-                  //calorieBurnController
-                  Container(
-                    width: width * 0.85,
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Pallete.surfaceColor,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      // crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // "Note".text.size(20).make(),
-                        Expanded(
-                          flex: 4,
-                          child: "Fat"
-                              .text
-                              .make()
-                              .box
-                              .margin(const EdgeInsets.only(top: 8, bottom: 8))
-                              // .padding(EdgeInsets.only(top: 8))
-                              .make(),
-                        ),
-                        SizedBox(
-                          width: width * 0.25,
-                          height: height * 0.04,
-                          child: InputTextField(
-                            label: "",
-                            boardRadius: 14,
-                            fillColor: Pallete.surfaceColor3,
-                            hide: false,
-                            controller: fatController,
-                            type: TextInputType.number,
-                          ),
-                        ),
-                        "%"
-                            .text
-                            .make()
-                            .box
-                            .width(width * 0.06)
-                            .margin(EdgeInsets.only(left: 4))
-                            .make()
-                      ],
-                    ),
-                  ),
-                  //cal consumed
-                  Container(
-                    width: width * 0.85,
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Pallete.surfaceColor,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      // crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // "Note".text.size(20).make(),
-                        Expanded(
-                          flex: 4,
-                          child: "Calorie burn"
-                              .text
-                              .make()
-                              .box
-                              .margin(const EdgeInsets.only(top: 8, bottom: 8))
-                              // .padding(EdgeInsets.only(top: 8))
-                              .make(),
-                        ),
-                        SizedBox(
-                          width: width * 0.25,
-                          height: height * 0.04,
-                          child: InputTextField(
-                            label: "",
-                            boardRadius: 14,
-                            fillColor: Pallete.surfaceColor3,
-                            hide: false,
-                            controller: calorieBurnController,
-                            type: TextInputType.number,
-                          ),
-                        ),
-                        "cal"
-                            .text
-                            .make()
-                            .box
-                            .width(width * 0.06)
-                            .margin(EdgeInsets.only(left: 4))
-                            .make()
-                      ],
-                    ),
-                  ),
-                  if (error != "")
                     SizedBox(
-                      height: height * 0.02,
+                      height: height * 0.03,
                     ),
-                  if (error != "")
-                    "${error}".text.color(Pallete.primaryColor).make(),
-                  Container(
-                          child: ("Save")
+                    Container(
+                      width: width * 0.85,
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Pallete.surfaceColor,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        // crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // "Note".text.size(20).make(),
+                          Expanded(
+                            flex: 4,
+                            child: "Weight"
+                                .text
+                                .make()
+                                .box
+                                .margin(
+                                    const EdgeInsets.only(top: 8, bottom: 8))
+                                // .padding(EdgeInsets.only(top: 8))
+                                .make(),
+                          ),
+                          SizedBox(
+                            width: width * 0.25,
+                            height: height * 0.04,
+                            child: InputTextField(
+                              label: "",
+                              boardRadius: 14,
+                              fillColor: Pallete.surfaceColor3,
+                              hide: false,
+                              controller: weightController,
+                              type: TextInputType.number,
+                            ),
+                          ),
+                          "kg"
                               .text
-                              .color(Pallete.backgroundColor)
-                              .size(16)
-                              .semiBold
-                              .makeCentered()
+                              .make()
                               .box
-                              .customRounded(
-                                  BorderRadius.circular(height * 0.02))
-                              .rounded
-                              .color(Pallete.primaryColor)
-                              .margin(EdgeInsets.only(top: height * 0.030))
-                              .height(height * 0.065)
-                              .width(width * 0.4)
-                              .makeCentered())
-                      .onTap(() {
-                    // saveOrBack(context);
-                    saveProgress();
-                  })
-                ],
+                              .width(width * 0.06)
+                              .margin(EdgeInsets.only(left: 4))
+                              .make()
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: width * 0.85,
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Pallete.surfaceColor,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        // crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // "Note".text.size(20).make(),
+                          Expanded(
+                            flex: 4,
+                            child: "Water consumed"
+                                .text
+                                .make()
+                                .box
+                                .margin(
+                                    const EdgeInsets.only(top: 8, bottom: 8))
+                                // .padding(EdgeInsets.only(top: 8))
+                                .make(),
+                          ),
+                          SizedBox(
+                            width: width * 0.25,
+                            height: height * 0.04,
+                            child: InputTextField(
+                              label: "",
+                              boardRadius: 14,
+                              fillColor: Pallete.surfaceColor3,
+                              hide: false,
+                              controller: waterInTakeController,
+                              type: TextInputType.number,
+                            ),
+                          ),
+                          "L"
+                              .text
+                              .make()
+                              .box
+                              .width(width * 0.06)
+                              .margin(EdgeInsets.only(left: 4))
+                              .make()
+                        ],
+                      ),
+                    ),
+                    //calorieBurnController
+                    Container(
+                      width: width * 0.85,
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Pallete.surfaceColor,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        // crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // "Note".text.size(20).make(),
+                          Expanded(
+                            flex: 4,
+                            child: "Fat"
+                                .text
+                                .make()
+                                .box
+                                .margin(
+                                    const EdgeInsets.only(top: 8, bottom: 8))
+                                // .padding(EdgeInsets.only(top: 8))
+                                .make(),
+                          ),
+                          SizedBox(
+                            width: width * 0.25,
+                            height: height * 0.04,
+                            child: InputTextField(
+                              label: "",
+                              boardRadius: 14,
+                              fillColor: Pallete.surfaceColor3,
+                              hide: false,
+                              controller: fatController,
+                              type: TextInputType.number,
+                            ),
+                          ),
+                          "%"
+                              .text
+                              .make()
+                              .box
+                              .width(width * 0.06)
+                              .margin(EdgeInsets.only(left: 4))
+                              .make()
+                        ],
+                      ),
+                    ),
+                    //cal consumed
+                    Container(
+                      width: width * 0.85,
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Pallete.surfaceColor,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        // crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // "Note".text.size(20).make(),
+                          Expanded(
+                            flex: 4,
+                            child: "Calorie burn"
+                                .text
+                                .make()
+                                .box
+                                .margin(
+                                    const EdgeInsets.only(top: 8, bottom: 8))
+                                // .padding(EdgeInsets.only(top: 8))
+                                .make(),
+                          ),
+                          SizedBox(
+                            width: width * 0.25,
+                            height: height * 0.04,
+                            child: InputTextField(
+                              label: "",
+                              boardRadius: 14,
+                              fillColor: Pallete.surfaceColor3,
+                              hide: false,
+                              controller: calorieBurnController,
+                              type: TextInputType.number,
+                            ),
+                          ),
+                          "cal"
+                              .text
+                              .make()
+                              .box
+                              .width(width * 0.06)
+                              .margin(EdgeInsets.only(left: 4))
+                              .make()
+                        ],
+                      ),
+                    ),
+                    if (error != "")
+                      SizedBox(
+                        height: height * 0.02,
+                      ),
+                    if (error != "")
+                      "${error}".text.color(Pallete.primaryColor).make(),
+                    Container(
+                            child: ("Save")
+                                .text
+                                .color(Pallete.backgroundColor)
+                                .size(16)
+                                .semiBold
+                                .makeCentered()
+                                .box
+                                .customRounded(
+                                    BorderRadius.circular(height * 0.02))
+                                .rounded
+                                .color(Pallete.primaryColor)
+                                .margin(EdgeInsets.only(top: height * 0.030))
+                                .height(height * 0.065)
+                                .width(width * 0.4)
+                                .makeCentered())
+                        .onTap(() {
+                      // saveOrBack(context);
+                      saveProgress();
+                    })
+                  ],
+                ),
               ),
             ),
           ),

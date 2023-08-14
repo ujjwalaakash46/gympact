@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
@@ -22,22 +23,113 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   List<Widget> carouselSliderItems = [
-    Image.asset(
-      'assets/images/prelogin1.jpg',
-      height: 200,
-      fit: BoxFit.cover,
+    Stack(
+      alignment: Alignment.center,
+      children: [
+        Image.asset(
+          'assets/images/prelogin1.jpg',
+          height: 800,
+          fit: BoxFit.cover,
+        ),
+        Positioned(
+          bottom: 10,
+          child: Container(
+            width: 200,
+            padding: const EdgeInsets.only(bottom: 30),
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color:
+                      Colors.black.withOpacity(0.8), // Shadow color and opacity
+                  blurRadius: 30, // Shadow blur radius
+                  spreadRadius: 8, // Shadow spread radius
+                  offset: const Offset(1, 4), // Shadow offset
+                ),
+              ],
+            ),
+            child: "With Gympact,\nTrack your workout"
+                .text
+                // .shadow(2, 2, 5, Pallete.whiteColor)
+                .align(TextAlign.left)
+                .size(28)
+                .fontWeight(FontWeight.w900)
+                .makeCentered(),
+          ),
+        )
+      ],
     ),
-    Image.asset(
-      'assets/images/prelogin3.jpg',
-      height: 200,
-      fit: BoxFit.cover,
+    Stack(
+      alignment: Alignment.center,
+      children: [
+        Image.asset(
+          'assets/images/prelogin3.jpg',
+          height: 800,
+          fit: BoxFit.cover,
+        ),
+        Positioned(
+          bottom: 10,
+          child: Container(
+            width: 200,
+            padding: const EdgeInsets.only(bottom: 30),
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color:
+                      Colors.black.withOpacity(0.8), // Shadow color and opacity
+                  blurRadius: 30, // Shadow blur radius
+                  spreadRadius: 8, // Shadow spread radius
+                  offset: const Offset(1, 4), // Shadow offset
+                ),
+              ],
+            ),
+            child: "See your Progress..."
+                .text
+                // .shadow(2, 2, 5, Pallete.whiteColor)
+                .align(TextAlign.left)
+                .size(28)
+                .fontWeight(FontWeight.w900)
+                .makeCentered(),
+          ),
+        )
+      ],
     ),
-    Image.asset(
-      'assets/images/prelogin5.jpg',
-      height: 200,
-      fit: BoxFit.cover,
+    Stack(
+      alignment: Alignment.center,
+      children: [
+        Image.asset(
+          'assets/images/prelogin5.jpg',
+          height: 800,
+          fit: BoxFit.cover,
+        ),
+        Positioned(
+          bottom: 10,
+          child: Container(
+            width: 200,
+            padding: const EdgeInsets.only(bottom: 30),
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color:
+                      Colors.black.withOpacity(0.8), // Shadow color and opacity
+                  blurRadius: 30, // Shadow blur radius
+                  spreadRadius: 8, // Shadow spread radius
+                  offset: const Offset(1, 4), // Shadow offset
+                ),
+              ],
+            ),
+            child: "Mark attendance and more!"
+                .text
+                // .shadow(2, 2, 5, Pallete.whiteColor)
+                .align(TextAlign.left)
+                .size(28)
+                .fontWeight(FontWeight.w900)
+                .makeCentered(),
+          ),
+        )
+      ],
     ),
   ];
+
   User? user;
   String? usersName = "Aman";
   int screenIndex = 0;
@@ -174,25 +266,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Container(
               width: width * 0.9,
               height: height * 0.6,
-              child: carouselSliderItems[carouselIndex]
-              // CarouselSlider(
-              //   options: CarouselOptions(
-              //     viewportFraction: 1,
-              //     height: height * 0.7,
-              //     autoPlay: true,
-              //     aspectRatio: 0.5,
-              //     enlargeCenterPage: true,
-              //     enableInfiniteScroll: false,
-              //     clipBehavior: Clip.antiAlias,
-              //     onPageChanged: (index, reason) {
-              //       setState(() {
-              //         carouselIndex = index;
-              //       });
-              //     },
-              //   ),
-              //   items: carouselSliderItems,
-              // ),
-              ),
+              child: carouselSliderItems[carouselIndex]),
           SizedBox(
             height: height * 0.03,
           ),

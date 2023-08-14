@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gympact/provider/user_state.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import 'package:gympact/constants/colors.dart';
@@ -140,6 +141,7 @@ class _AdminGymDetailsState extends ConsumerState<AdminGymDetails> {
   }
 
   logout() {
+    ref.read(userProvider.notifier).logout();
     UserService().logout(context);
   }
 
@@ -153,14 +155,16 @@ class _AdminGymDetailsState extends ConsumerState<AdminGymDetails> {
   Widget build(BuildContext context) {
     gym = ref.read(gymProvider.notifier).get()!;
     Map<String, dynamic> map = ref.watch(statisticProvider);
-    packageList = List<PackagePerformance>.from(
-        (map["packageDetails"] as List<dynamic>)
-            .map((e) => PackagePerformance.fromMap(e as Map<String, dynamic>)));
-    totalRevenue = double.parse(map["totalOfTotal"].toString()).toInt();
-    newMembers = map["newJoinee"] as int;
-    totalmember = map["totalActive"] as int;
-    renewMember = map["renewed"] as int;
-    discontiunedMembers = map["discontinued"] as int;
+    if (map["packageDetails"] != null) {
+      packageList = List<PackagePerformance>.from((map["packageDetails"]
+              as List<dynamic>)
+          .map((e) => PackagePerformance.fromMap(e as Map<String, dynamic>)));
+      totalRevenue = double.parse(map["totalOfTotal"].toString()).toInt();
+      newMembers = map["newJoinee"] as int;
+      totalmember = map["totalActive"] as int;
+      renewMember = map["renewed"] as int;
+      discontiunedMembers = map["discontinued"] as int;
+    }
     // totalRevenue = 0;
 
     final height = MediaQuery.of(context).size.height;

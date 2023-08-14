@@ -79,6 +79,7 @@ class _UserProfileState extends ConsumerState<UserProfile> {
   var stretchingReminderList = Constant.reminderInterval;
 
   logout() {
+    ref.read(userProvider.notifier).logout();
     UserService().logout(context);
   }
 
@@ -86,377 +87,392 @@ class _UserProfileState extends ConsumerState<UserProfile> {
     if (waterReminder != user.waterReminder ||
         stretchingReminder != user.stretchReminder) {
       final gymId = ref.read(gymProvider)!.id;
+      user.waterReminder = waterReminder;
+      user.stretchReminder = stretchingReminder;
       await UserService().updateUserData(gymId, user);
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    user = ref.read(userProvider)!;
+    stretchingReminder = user.stretchReminder ?? 0;
+    waterReminder = user.waterReminder ?? 0;
   }
 
   var showSaveReminderBtn = false;
   @override
   Widget build(BuildContext context) {
     user = ref.watch(userProvider)!;
-    stretchingReminder = user.stretchReminder ?? 0;
-    waterReminder = user.waterReminder ?? 0;
+
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.all(8.0),
       child: SafeArea(
-        child: Center(
-          child: Column(
-            children: [
-              Container(
-                // color: Pallete.surfaceColor,
-                width: width * 0.85,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 8),
-                      child: "Profile"
-                          .text
-                          .size(24)
-                          .fontFamily("Montserrat")
-                          .fontWeight(FontWeight.w900)
-                          .make(),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 4),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              "Power Coins"
-                                  .text
-                                  .color(Pallete.primaryColor)
-                                  .make(),
-                              "${user.coin}"
-                                  .text
-                                  .make()
-                                  .box
-                                  .width(width * 0.1)
-                                  .makeCentered(),
-                            ],
-                          ).box.width(width * 0.35).make(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              "Level".text.color(Pallete.primaryColor).make(),
-                              "${user.level}"
-                                  .text
-                                  .make()
-                                  .box
-                                  .width(width * 0.1)
-                                  .makeCentered(),
-                            ],
-                          ).box.width(width * 0.35).make(),
-                        ],
+        child: GestureDetector(
+          onTap: () => {FocusScope.of(context).requestFocus(FocusNode())},
+          child: Center(
+            child: Column(
+              children: [
+                Container(
+                  // color: Pallete.surfaceColor,
+                  width: width * 0.85,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(top: 8),
+                        child: "Profile"
+                            .text
+                            .size(24)
+                            .fontFamily("Montserrat")
+                            .fontWeight(FontWeight.w900)
+                            .make(),
                       ),
-                    )
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: height * 0.03,
-              ),
-              Container(
-                width: width * 0.85,
-                margin: const EdgeInsets.only(top: 4),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Pallete.surfaceColor,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      // color: Pallete.ligthBlack,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          user.name.text.size(20).make(),
-                          // ("${Common.getAge(user.dob).toString()} yrs")
-                          //     .text
-                          //     .make()
-                          //     .box
-                          //     .margin(const EdgeInsets.only(right: 28))
-                          //     .make()
-                        ],
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          children: [
-                            user.currentPackage!.package.name.text
-                                .color(Pallete.primaryColor)
-                                .make()
-                                .box
-                                .margin(const EdgeInsets.symmetric(vertical: 8))
-                                .make(),
-                            Text("${Common.formatDate(user.currentPackage!.startDate)} - ${Common.formatDate(user.currentPackage!.endDate)}")
-                                .box
-                                .margin(const EdgeInsets.only(bottom: 16))
-                                .make(),
-                          ],
-                        ),
-                        Column(
+                      Padding(
+                        padding: EdgeInsets.only(top: 4),
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            "Joined on"
-                                .text
-                                .make()
-                                .box
-                                .margin(const EdgeInsets.symmetric(vertical: 8))
-                                .make(),
-                            Common.formatDate(user.joinOn ?? DateTime.now())
-                                .text
-                                .make()
-                                .box
-                                .margin(const EdgeInsets.only(bottom: 16))
-                                .make()
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                "Power Coins"
+                                    .text
+                                    .color(Pallete.primaryColor)
+                                    .make(),
+                                "${user.coin}"
+                                    .text
+                                    .make()
+                                    .box
+                                    .width(width * 0.1)
+                                    .makeCentered(),
+                              ],
+                            ).box.width(width * 0.35).make(),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                "Level".text.color(Pallete.primaryColor).make(),
+                                "${user.level}"
+                                    .text
+                                    .make()
+                                    .box
+                                    .width(width * 0.1)
+                                    .makeCentered(),
+                              ],
+                            ).box.width(width * 0.35).make(),
                           ],
-                        )
-                      ],
-                    ),
-                    HStack(
-                      [
-                        "Weight"
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: height * 0.03,
+                ),
+                Container(
+                  width: width * 0.85,
+                  margin: const EdgeInsets.only(top: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Pallete.surfaceColor,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        // color: Pallete.ligthBlack,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            user.name.text.size(20).make(),
+                            // ("${Common.getAge(user.dob).toString()} yrs")
+                            //     .text
+                            //     .make()
+                            //     .box
+                            //     .margin(const EdgeInsets.only(right: 28))
+                            //     .make()
+                          ],
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            children: [
+                              user.currentPackage!.package.name.text
+                                  .color(Pallete.primaryColor)
+                                  .make()
+                                  .box
+                                  .margin(
+                                      const EdgeInsets.symmetric(vertical: 8))
+                                  .make(),
+                              Text("${Common.formatDate(user.currentPackage!.startDate)} - ${Common.formatDate(user.currentPackage!.endDate)}")
+                                  .box
+                                  .margin(const EdgeInsets.only(bottom: 16))
+                                  .make(),
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              "Joined on"
+                                  .text
+                                  .make()
+                                  .box
+                                  .margin(
+                                      const EdgeInsets.symmetric(vertical: 8))
+                                  .make(),
+                              Common.formatDate(user.joinOn ?? DateTime.now())
+                                  .text
+                                  .make()
+                                  .box
+                                  .margin(const EdgeInsets.only(bottom: 16))
+                                  .make()
+                            ],
+                          )
+                        ],
+                      ),
+                      HStack(
+                        [
+                          "Weight"
+                              .text
+                              // .color(Pallete.primaryFade)
+                              .make()
+                              .box
+                              .width(width * 0.3)
+                              .make(),
+                          ("${user.weight.toString()} Kg")
+                              .text
+                              .color(Pallete.primaryColor)
+                              .make()
+                        ],
+                      )
+                          .box
+                          .margin(const EdgeInsets.symmetric(vertical: 8))
+                          .make(),
+                      HStack(
+                        [
+                          "Height".text.make().box.width(width * 0.3).make(),
+                          ("${user.heigth.toString()} cm")
+                              .text
+                              .color(Pallete.primaryColor)
+                              .make()
+                        ],
+                      )
+                          .box
+                          .margin(const EdgeInsets.symmetric(vertical: 8))
+                          .make(),
+                      HStack(
+                        [
+                          "Goal".text.make().box.width(width * 0.3).make(),
+                          user.goal
+                              .toString()
+                              .text
+                              .color(Pallete.primaryColor)
+                              .make()
+                        ],
+                      )
+                          .box
+                          .margin(const EdgeInsets.symmetric(vertical: 8))
+                          .make(),
+                      SizedBox(
+                        height: height * 0.02,
+                      ),
+                      HStack([
+                        "Water Reminder"
                             .text
-                            // .color(Pallete.primaryFade)
                             .make()
                             .box
-                            .width(width * 0.3)
+                            .width(width * 0.45)
                             .make(),
-                        ("${user.weight.toString()} Kg")
+                        DropdownButton<int>(
+                          itemHeight: kMinInteractiveDimension,
+                          style: const TextStyle(fontSize: 16),
+                          value: waterReminder,
+                          borderRadius: BorderRadius.circular(24),
+                          items: waterReminderList.map((var value) {
+                            return DropdownMenuItem<int>(
+                              value: (value["value"] as int),
+                              child: Text("${value["name"]}").box.make(),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              showSaveReminderBtn = true;
+                              waterReminder = value!;
+                            });
+                          },
+                        )
+                      ]),
+                      HStack([
+                        "Stretching Reminder"
                             .text
-                            .color(Pallete.primaryColor)
                             .make()
-                      ],
-                    )
-                        .box
-                        .margin(const EdgeInsets.symmetric(vertical: 8))
-                        .make(),
-                    HStack(
-                      [
-                        "Height".text.make().box.width(width * 0.3).make(),
-                        ("${user.heigth.toString()} cm")
-                            .text
-                            .color(Pallete.primaryColor)
-                            .make()
-                      ],
-                    )
-                        .box
-                        .margin(const EdgeInsets.symmetric(vertical: 8))
-                        .make(),
-                    HStack(
-                      [
-                        "Goal".text.make().box.width(width * 0.3).make(),
-                        user.goal
-                            .toString()
-                            .text
-                            .color(Pallete.primaryColor)
-                            .make()
-                      ],
-                    )
-                        .box
-                        .margin(const EdgeInsets.symmetric(vertical: 8))
-                        .make(),
-                    SizedBox(
-                      height: height * 0.02,
-                    ),
-                    HStack([
-                      "Water Reminder"
+                            .box
+                            .width(width * 0.45)
+                            .make(),
+                        DropdownButton<int>(
+                          style: const TextStyle(fontSize: 16),
+                          value: stretchingReminder,
+                          borderRadius: BorderRadius.circular(24),
+                          items: stretchingReminderList.map((var value) {
+                            return DropdownMenuItem<int>(
+                              value: (value["value"] as int),
+                              child: "${value["name"]}".text.make(),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              showSaveReminderBtn = true;
+                              stretchingReminder = value!;
+                            });
+                          },
+                        )
+                      ]),
+                      "we will send notification reminder"
                           .text
+                          .italic
+                          .color(Pallete.whiteDarkColor)
                           .make()
                           .box
-                          .width(width * 0.45)
+                          .margin(
+                              EdgeInsets.only(top: 4, bottom: height * 0.012))
                           .make(),
-                      DropdownButton<int>(
-                        itemHeight: kMinInteractiveDimension,
-                        style: const TextStyle(fontSize: 16),
-                        value: waterReminder,
-                        borderRadius: BorderRadius.circular(24),
-                        items: waterReminderList.map((var value) {
-                          return DropdownMenuItem<int>(
-                            value: (value["value"] as int),
-                            child: Text("${value["name"]}").box.make(),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            showSaveReminderBtn = true;
-                            waterReminder = value!;
-                          });
-                        },
-                      )
-                    ]),
-                    HStack([
-                      "Stretching Reminder"
-                          .text
-                          .make()
-                          .box
-                          .width(width * 0.45)
-                          .make(),
-                      DropdownButton<int>(
-                        style: const TextStyle(fontSize: 16),
-                        value: stretchingReminder,
-                        borderRadius: BorderRadius.circular(24),
-                        items: stretchingReminderList.map((var value) {
-                          return DropdownMenuItem<int>(
-                            value: (value["value"] as int),
-                            child: "${value["name"]}".text.make(),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            showSaveReminderBtn = true;
-                            stretchingReminder = value!;
-                          });
-                        },
-                      )
-                    ]),
-                    "we will send notification reminder"
-                        .text
-                        .italic
-                        .color(Pallete.whiteDarkColor)
-                        .make()
-                        .box
-                        .margin(EdgeInsets.only(top: 4, bottom: height * 0.012))
-                        .make(),
-                    if (waterReminder != user.waterReminder ||
-                        stretchingReminder != user.stretchReminder)
-                      "save"
-                          .text
-                          .size(16)
-                          .color(Pallete.surfaceColor)
-                          .makeCentered()
-                          .box
-                          .rounded
-                          .height(height * 0.04)
-                          .margin(EdgeInsets.only(
-                              left: width * 0.6, bottom: height * 0.012))
-                          .width(width * 0.16)
-                          .color(Pallete.primaryColor)
-                          .make()
-                          .onTap(() {
-                        saveReminder();
-                      }),
-                    // "Badges Earned".text.make(),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 1,
-              ),
-              Container(
-                width: width * 0.85,
-                height: height * 0.18,
-                margin: EdgeInsets.all(16),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                decoration: BoxDecoration(
-                  color: Pallete.surfaceColor,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: VStack(
-                  [
-                    "Badges Earned"
-                        .text
-                        .make()
-                        .box
-                        .margin(const EdgeInsets.only(left: 10, bottom: 15))
-                        .make(),
-                    Container(
-                        height: height * 0.1,
-                        width: width * 0.85,
-                        child: [
-                          if (true)
-                            "adding this shortly"
-                                .text
-                                .color(Pallete.whiteDarkColor)
-                                .makeCentered()
-                                .box
-                                .width(width * 0.85)
-                                .padding(const EdgeInsets.all(12))
-                                .make(),
-                        ].first
-
-                        //Dont delete it!
-
-                        // GridView.count(
-                        //   physics: BouncingScrollPhysics(),
-                        //   scrollDirection: Axis.horizontal,
-                        //   crossAxisCount: 1,
-                        //   children: (user.badgesList ?? [])
-                        //       .map((e) => e.name.text
-                        //           .make()
-                        //           .box
-                        //           .margin(EdgeInsets.all(8))
-                        //           .height(10)
-                        //           .width(10)
-                        //           .color(Pallete.commonBlueColor)
-                        //           .make())
-                        //       .toList(),
-                        // ),
-
-                        ),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 1,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  InkWell(
-                    onTap: (() {
-                      logout();
-                    }),
-                    child: Container(
-                      height: height * 0.05,
-                      width: width * 0.3,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          border: Border.all(
-                              color: Pallete.primaryColor, width: 1.5)),
-                      child: "Logout".text.size(14).makeCentered(),
-                    ).box.make(),
+                      if ((waterReminder != user.waterReminder ||
+                          stretchingReminder != user.stretchReminder))
+                        "save"
+                            .text
+                            .size(16)
+                            .color(Pallete.surfaceColor)
+                            .makeCentered()
+                            .box
+                            .rounded
+                            .height(height * 0.04)
+                            .margin(EdgeInsets.only(
+                                left: width * 0.6, bottom: height * 0.012))
+                            .width(width * 0.16)
+                            .color(Pallete.primaryColor)
+                            .make()
+                            .onTap(() {
+                          saveReminder();
+                        }),
+                      // "Badges Earned".text.make(),
+                    ],
                   ),
-                  InkWell(
-                    onTap: (() {
-                      Navigator.of(context)
-                          .pushNamed(UserSetting.userSettingRoute);
-                    }),
-                    child: Container(
-                      height: height * 0.05,
-                      width: width * 0.3,
-                      decoration: BoxDecoration(
-                          color: Pallete.primaryColor,
-                          borderRadius: BorderRadius.circular(15),
-                          border: Border.all(
-                              color: Pallete.primaryColor, width: 1.5)),
-                      child: "Edit Profile"
+                ),
+                SizedBox(
+                  height: 1,
+                ),
+                Container(
+                  width: width * 0.85,
+                  height: height * 0.18,
+                  margin: EdgeInsets.all(16),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: Pallete.surfaceColor,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: VStack(
+                    [
+                      "Badges Earned"
                           .text
-                          .color(Pallete.surfaceColor)
-                          .size(14)
-                          .makeCentered(),
-                    ),
-                  )
-                ],
+                          .make()
+                          .box
+                          .margin(const EdgeInsets.only(left: 10, bottom: 15))
+                          .make(),
+                      Container(
+                          height: height * 0.1,
+                          width: width * 0.85,
+                          child: [
+                            if (true)
+                              "adding this shortly"
+                                  .text
+                                  .color(Pallete.whiteDarkColor)
+                                  .makeCentered()
+                                  .box
+                                  .width(width * 0.85)
+                                  .padding(const EdgeInsets.all(12))
+                                  .make(),
+                          ].first
 
-                // crossAlignment: CrossAxisAlignment.center,
-              )
-            ],
+                          //Dont delete it!
+
+                          // GridView.count(
+                          //   physics: BouncingScrollPhysics(),
+                          //   scrollDirection: Axis.horizontal,
+                          //   crossAxisCount: 1,
+                          //   children: (user.badgesList ?? [])
+                          //       .map((e) => e.name.text
+                          //           .make()
+                          //           .box
+                          //           .margin(EdgeInsets.all(8))
+                          //           .height(10)
+                          //           .width(10)
+                          //           .color(Pallete.commonBlueColor)
+                          //           .make())
+                          //       .toList(),
+                          // ),
+
+                          ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 1,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    InkWell(
+                      onTap: (() {
+                        logout();
+                      }),
+                      child: Container(
+                        height: height * 0.05,
+                        width: width * 0.3,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(
+                                color: Pallete.primaryColor, width: 1.5)),
+                        child: "Logout".text.size(14).makeCentered(),
+                      ).box.make(),
+                    ),
+                    InkWell(
+                      onTap: (() {
+                        Navigator.of(context)
+                            .pushNamed(UserSetting.userSettingRoute);
+                      }),
+                      child: Container(
+                        height: height * 0.05,
+                        width: width * 0.3,
+                        decoration: BoxDecoration(
+                            color: Pallete.primaryColor,
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(
+                                color: Pallete.primaryColor, width: 1.5)),
+                        child: "Edit Profile"
+                            .text
+                            .color(Pallete.surfaceColor)
+                            .size(14)
+                            .makeCentered(),
+                      ),
+                    )
+                  ],
+
+                  // crossAlignment: CrossAxisAlignment.center,
+                )
+              ],
+            ),
           ),
         ),
       ),

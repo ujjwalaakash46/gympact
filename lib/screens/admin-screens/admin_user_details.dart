@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/common/widgets/text_field.dart';
 import 'package:gympact/constants/colors.dart';
+import 'package:gympact/constants/constants.dart';
 import 'package:gympact/constants/enums.dart';
 import 'package:gympact/models/current_package.dart';
 import 'package:gympact/models/diet.dart';
@@ -15,6 +16,7 @@ import 'package:gympact/provider/gym_state.dart';
 import 'package:gympact/screens/admin-screens/admin_user_add.dart';
 import 'package:gympact/service/user_service.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class AdminUserDetails extends ConsumerStatefulWidget {
@@ -49,6 +51,7 @@ class _AdminUserDetailsState extends ConsumerState<AdminUserDetails> {
           } else {
             isEmptyList = false;
           }
+          print(userList);
         });
         // _onExit();
       } else {
@@ -259,7 +262,7 @@ class _AdminUserDetailsState extends ConsumerState<AdminUserDetails> {
                                     //change to network
                                     child: e.profileImg != null
                                         ? Image.network(
-                                            e.profileImg!,
+                                            Constant.imgUrl + e.profileImg!,
                                             fit: BoxFit.contain,
                                           )
                                         : Image.asset(
@@ -282,7 +285,7 @@ class _AdminUserDetailsState extends ConsumerState<AdminUserDetails> {
                               const Icon(
                                 Icons.arrow_circle_right_outlined,
                                 color: Pallete.whiteColor,
-                                size: 32,
+                                size: 36,
                               ).box.make().onTap(() {
                                 Navigator.of(context).pushNamed(
                                     AdminUserAdd.adminUserAddRoute,
@@ -334,7 +337,14 @@ class _AdminUserDetailsState extends ConsumerState<AdminUserDetails> {
                                   .color(Pallete.primaryColor)
                                   .height(height * 0.05)
                                   .width(width * 0.35)
-                                  .makeCentered(),
+                                  .makeCentered()
+                                  .onTap(() async {
+                                print(11);
+                                Uri url = Uri(scheme: 'tel', path: e.phone);
+                                if (await canLaunchUrl(url)) {
+                                  await launchUrl(url);
+                                }
+                              }),
                               Container(
                                 // margin: const EdgeInsets.only(top: 18, bottom: 6),
                                 // padding: const EdgeInsets.all(12),
@@ -360,13 +370,15 @@ class _AdminUserDetailsState extends ConsumerState<AdminUserDetails> {
                                     // ),
                                     borderRadius: BorderRadius.circular(15)),
                                 child: Center(
-                                    child: "Make Present"
+                                    child: "Mark Present"
                                         .text
                                         .color(Pallete.primaryFade2)
                                         .makeCentered()
                                         .box
                                         .make()
-                                        .onInkTap(() {})),
+                                        .onInkTap(() {
+                                  UserService().markAttendance(e.id!);
+                                })),
                               ),
                               // "Make Present".text.make()
                             ],

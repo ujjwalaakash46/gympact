@@ -1,5 +1,8 @@
 class Constant {
-  static String baseUrl = "http://10.0.2.2:8082";
+  static String baseUrl = "http://13.233.184.163:8082";
+  // static String baseUrl = "http://10.0.2.2:8082";
+
+  static String imgUrl = "http://13.233.184.163:8082/user/getImage?filename=";
 
   static final reminderInterval = [
     {"name": "No Reminder", "value": 0},

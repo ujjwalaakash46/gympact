@@ -3,6 +3,8 @@ import 'package:gympact/models/diet.dart';
 import 'package:gympact/models/package.dart';
 import 'package:http/http.dart' as http;
 
+import '../models/group.dart';
+
 class GymService {
   var client = http.Client();
 
@@ -55,6 +57,32 @@ class GymService {
     var url = Uri.parse("$baseUrl/gym/saveDiet?id=$gymId");
     var response = await client.post(url,
         headers: {"Content-Type": "application/json"}, body: diet.toJson());
+    return response;
+  }
+
+  Future<http.Response> createGroup(int id, String groupName) async {
+    var url = Uri.parse("$baseUrl/gym/saveGroup?id=$id&groupName=$groupName");
+    var response = await client.get(url);
+    return response;
+  }
+
+  Future<http.Response> addMember(int groupId, int userId) async {
+    var url =
+        Uri.parse("$baseUrl/gym/addMember?groupId=$groupId&userId=$userId");
+    var response = await client.get(url);
+    return response;
+  }
+
+  Future<http.Response> getGroups(int id) async {
+    var url = Uri.parse("$baseUrl/gym/getGroups?id=$id");
+    var response = await client.get(url);
+    return response;
+  }
+
+  Future<http.Response> notifyGroup(int groupId, Message message) async {
+    var url = Uri.parse("$baseUrl/gym/notifyGroup?groupId=$groupId");
+    var response = await client.post(url,
+        headers: {"Content-Type": "application/json"}, body: message.toJson());
     return response;
   }
 }

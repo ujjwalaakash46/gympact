@@ -8,14 +8,12 @@ import 'package:intl/intl.dart';
 
 class Group {
   int? id;
-  int gymId;
   String name;
   List<User> members;
   int totalMembers;
   List<Message> messages;
   Group({
     this.id,
-    required this.gymId,
     required this.name,
     required this.members,
     required this.totalMembers,
@@ -32,7 +30,6 @@ class Group {
   }) {
     return Group(
       id: id ?? this.id,
-      gymId: gymId ?? this.gymId,
       name: name ?? this.name,
       members: members ?? this.members,
       totalMembers: totalMembers ?? this.totalMembers,
@@ -43,7 +40,6 @@ class Group {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'gymId': gymId,
       'name': name,
       'members': members.map((x) => x.toMap()).toList(),
       'totalMembers': totalMembers,
@@ -54,16 +50,15 @@ class Group {
   factory Group.fromMap(Map<String, dynamic> map) {
     return Group(
       id: map['id'] != null ? map['id'] as int : null,
-      gymId: map['gymId'] as int,
       name: map['name'] as String,
       members: List<User>.from(
-        (map['members'] as List<int>).map<User>(
+        (map['members'] as List<dynamic>).map<User>(
           (x) => User.fromMap(x as Map<String, dynamic>),
         ),
       ),
       totalMembers: map['totalMembers'] as int,
       messages: List<Message>.from(
-        (map['messages'] as List<int>).map<Message>(
+        (map['messages'] as List<dynamic>).map<Message>(
           (x) => Message.fromMap(x as Map<String, dynamic>),
         ),
       ),
@@ -77,7 +72,7 @@ class Group {
 
   @override
   String toString() {
-    return 'Group(id: $id, gymId: $gymId, name: $name, members: $members, totalMembers: $totalMembers, messages: $messages)';
+    return 'Group(id: $id, name: $name, members: $members, totalMembers: $totalMembers, messages: $messages)';
   }
 
   @override
@@ -85,7 +80,6 @@ class Group {
     if (identical(this, other)) return true;
 
     return other.id == id &&
-        other.gymId == gymId &&
         other.name == name &&
         listEquals(other.members, members) &&
         other.totalMembers == totalMembers &&
@@ -95,7 +89,6 @@ class Group {
   @override
   int get hashCode {
     return id.hashCode ^
-        gymId.hashCode ^
         name.hashCode ^
         members.hashCode ^
         totalMembers.hashCode ^
@@ -128,7 +121,8 @@ class Message {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'createdOn': createdOn.toIso8601String(),
+      'createdOn':
+          DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(createdOn).toString(),
       'data': data,
     };
   }

@@ -3,12 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/constants/colors.dart';
-import 'package:gympact/models/attendance.dart';
 import 'package:gympact/provider/gym_state.dart';
 import 'package:gympact/provider/user_state.dart';
 import 'package:gympact/service/user_service.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class UserAttendance extends ConsumerStatefulWidget {
@@ -22,9 +20,9 @@ class UserAttendance extends ConsumerStatefulWidget {
 
 class _UserAttendanceState extends ConsumerState<UserAttendance> {
   String scannedCode = "";
-  String gymId = "1212";
+  String gymId = "1";
   bool qrFound = false;
-  bool attendanceMarked = true;
+  bool attendanceMarked = false;
   bool packageEnded = false;
 
   @override
@@ -43,6 +41,7 @@ class _UserAttendanceState extends ConsumerState<UserAttendance> {
         final response = await UserService().markAttendance(userId!);
         if (response.statusCode == 200) {
           attendanceMarked = true;
+          ref.read(userProvider.notifier).fetchUserData();
         } else if (response.statusCode == 406) {
           attendanceMarked = false;
           packageEnded = true;
@@ -60,7 +59,15 @@ class _UserAttendanceState extends ConsumerState<UserAttendance> {
     final userId = ref.read(userProvider)!.id;
     final response = await UserService().checkTodaysAttendance(userId!);
     if (response.statusCode == 200) {
-      attendanceMarked = true;
+      print(1);
+      final res = (json.decode(response.body) as Map<String, dynamic>);
+      if (res.isNotEmpty) {
+        print(2);
+        attendanceMarked = true;
+      } else {
+        print(3);
+        attendanceMarked = false;
+      }
     } else if (response.statusCode == 406) {
       attendanceMarked = false;
       packageEnded = true;

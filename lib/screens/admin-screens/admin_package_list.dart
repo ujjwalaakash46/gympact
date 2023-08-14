@@ -299,147 +299,150 @@ class _AdminPackageListState extends ConsumerState<AdminPackageList> {
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.all(8.0),
         child: SafeArea(
-          child: Center(
-            child: Column(
-              children: [
-                if (!isAddNewPackage) ...[
-                  SizedBox(
-                    // margin: const EdgeInsets.only(),
-                    width: width * 0.85,
-                    child: "Package List"
-                        .text
-                        .size(24)
-                        .fontFamily("Montserrat")
-                        .fontWeight(FontWeight.w900)
-                        .make(),
-                  ),
-                  SizedBox(
-                    height: height * 0.03,
-                  ),
-                  if (packageList.isEmpty)
-                    "No Package Added"
-                        .text
-                        .color(Pallete.whiteDarkColor)
-                        .make()
-                        .box
-                        .margin(EdgeInsets.symmetric(vertical: height * 0.02))
-                        .make(),
-                  ...packageList.mapIndexed((value, index) {
-                    return Container(
+          child: GestureDetector(
+            onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+            child: Center(
+              child: Column(
+                children: [
+                  if (!isAddNewPackage) ...[
+                    SizedBox(
+                      // margin: const EdgeInsets.only(),
                       width: width * 0.85,
-                      padding: const EdgeInsets.only(
-                          top: 12, bottom: 12, left: 20, right: 12),
-                      margin: const EdgeInsets.only(
-                        top: 4,
-                        bottom: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Pallete.surfaceColor2,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                flex: 2,
-                                child: value.name.text
+                      child: "Package List"
+                          .text
+                          .size(24)
+                          .fontFamily("Montserrat")
+                          .fontWeight(FontWeight.w900)
+                          .make(),
+                    ),
+                    SizedBox(
+                      height: height * 0.03,
+                    ),
+                    if (packageList.isEmpty)
+                      "No Package Added"
+                          .text
+                          .color(Pallete.whiteDarkColor)
+                          .make()
+                          .box
+                          .margin(EdgeInsets.symmetric(vertical: height * 0.02))
+                          .make(),
+                    ...packageList.mapIndexed((value, index) {
+                      return Container(
+                        width: width * 0.85,
+                        padding: const EdgeInsets.only(
+                            top: 12, bottom: 12, left: 20, right: 12),
+                        margin: const EdgeInsets.only(
+                          top: 4,
+                          bottom: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Pallete.surfaceColor2,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: value.name.text
+                                      .size(16)
+                                      .color(Pallete.primaryColor)
+                                      .make()
+                                      .box
+                                      .margin(EdgeInsets.only(bottom: 4))
+                                      .make(),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: height * 0.005,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                "${value.durationInMonths} Month"
+                                    .text
                                     .size(16)
-                                    .color(Pallete.primaryColor)
                                     .make()
                                     .box
                                     .margin(EdgeInsets.only(bottom: 4))
                                     .make(),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: height * 0.005,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              "${value.durationInMonths} Month"
-                                  .text
-                                  .size(16)
-                                  .make()
-                                  .box
-                                  .margin(EdgeInsets.only(bottom: 4))
-                                  .make(),
-                              "₹ ${value.price}"
-                                  .text
-                                  .size(16)
-                                  .make()
-                                  .box
-                                  .margin(EdgeInsets.only(bottom: 4))
-                                  .make(),
-                            ],
-                          ),
-                          SizedBox(
-                            height: height * 0.005,
-                          ),
-                          if (value.benefits.isNotEmpty)
-                            "Facilities "
-                                .text
-                                .color(Pallete.whiteDarkColor)
-                                .make(),
-                          Wrap(
-                            children: [
-                              ...value.benefits.map((e) => Container(
-                                    margin: const EdgeInsets.all(8),
-                                    child: " • $e".text.make(),
-                                  )),
-                            ],
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-                  Container(
-                    margin: const EdgeInsets.only(top: 18, bottom: 6),
-                    padding: const EdgeInsets.all(12),
-                    height: height * 0.065,
-                    width: width * 0.7,
-                    decoration: BoxDecoration(
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color.fromARGB(66, 14, 14, 14),
-                            offset: Offset(
-                              0,
-                              4.0,
+                                "₹ ${value.price}"
+                                    .text
+                                    .size(16)
+                                    .make()
+                                    .box
+                                    .margin(EdgeInsets.only(bottom: 4))
+                                    .make(),
+                              ],
                             ),
-                            blurRadius: 9.0,
-                            spreadRadius: 2.0,
-                          ),
-                        ],
-                        color: Pallete.surfaceColor,
-                        border: Border.all(
-                          style: BorderStyle.solid,
-                          color: Pallete.primaryFade,
-                          width: 1.5,
+                            SizedBox(
+                              height: height * 0.005,
+                            ),
+                            if (value.benefits.isNotEmpty)
+                              "Facilities "
+                                  .text
+                                  .color(Pallete.whiteDarkColor)
+                                  .make(),
+                            Wrap(
+                              children: [
+                                ...value.benefits.map((e) => Container(
+                                      margin: const EdgeInsets.all(8),
+                                      child: " • $e".text.make(),
+                                    )),
+                              ],
+                            ),
+                          ],
                         ),
-                        borderRadius: BorderRadius.circular(15)),
-                    child: Center(
-                      child: "Add New Package"
-                          .text
-                          .color(Pallete.primaryFade2)
-                          .makeCentered()
-                          .box
-                          .make()
-                          .onInkTap(
-                        () {
-                          setState(() {
-                            isAddNewPackage = !isAddNewPackage;
-                          });
-                        },
+                      );
+                    }),
+                    Container(
+                      margin: const EdgeInsets.only(top: 18, bottom: 6),
+                      padding: const EdgeInsets.all(12),
+                      height: height * 0.065,
+                      width: width * 0.7,
+                      decoration: BoxDecoration(
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color.fromARGB(66, 14, 14, 14),
+                              offset: Offset(
+                                0,
+                                4.0,
+                              ),
+                              blurRadius: 9.0,
+                              spreadRadius: 2.0,
+                            ),
+                          ],
+                          color: Pallete.surfaceColor,
+                          border: Border.all(
+                            style: BorderStyle.solid,
+                            color: Pallete.primaryFade,
+                            width: 1.5,
+                          ),
+                          borderRadius: BorderRadius.circular(15)),
+                      child: Center(
+                        child: "Add New Package"
+                            .text
+                            .color(Pallete.primaryFade2)
+                            .makeCentered()
+                            .box
+                            .make()
+                            .onInkTap(
+                          () {
+                            setState(() {
+                              isAddNewPackage = !isAddNewPackage;
+                            });
+                          },
+                        ),
                       ),
                     ),
-                  ),
+                  ],
+                  if (isAddNewPackage) _onAddNewPackage(context)
                 ],
-                if (isAddNewPackage) _onAddNewPackage(context)
-              ],
+              ),
             ),
           ),
         ),

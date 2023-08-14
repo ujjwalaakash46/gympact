@@ -5,14 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gympact/common/widgets/text_field.dart';
 import 'package:gympact/constants/colors.dart';
+import 'package:gympact/constants/constants.dart';
 import 'package:gympact/constants/enums.dart';
-import 'package:gympact/models/badges.dart';
 import 'package:gympact/models/current_package.dart';
 import 'package:gympact/models/diet.dart';
-import 'package:gympact/models/exercise.dart';
 import 'package:gympact/models/package.dart';
 import 'package:gympact/models/user.dart';
-import 'package:http/http.dart' as http;
 import 'package:gympact/models/workout.dart';
 import 'package:gympact/provider/gym_state.dart';
 import 'package:gympact/service/user_service.dart';
@@ -44,6 +42,7 @@ class _AdminUserAddState extends ConsumerState<AdminUserAdd> {
   late int coin;
   late int level;
   late int gymId;
+  late int userId;
 
   // List<Badges> badgesList = [];
   // List<Workout> workoutList = [];
@@ -65,7 +64,7 @@ class _AdminUserAddState extends ConsumerState<AdminUserAdd> {
 
   List<String> gymGoalList = [
     "Get Fitter",
-    "Loss Weigth",
+    "Loss Weight",
     "Gain Weight",
     "Maintain Health"
   ];
@@ -80,8 +79,9 @@ class _AdminUserAddState extends ConsumerState<AdminUserAdd> {
   ];
 
   Future getImage(ImageSource source) async {
-    final img = await ImagePicker().pickImage(source: source);
+    final img = await ImagePicker().pickImage(source: source, imageQuality: 5);
     if (img == null) return;
+
     setState(() {
       image = File(img.path);
     });
@@ -95,7 +95,7 @@ class _AdminUserAddState extends ConsumerState<AdminUserAdd> {
     } else if (phoneController.text.isEmpty) {
       newErrorMessage = "Phone number is not set";
     } else if (weightController.text.isEmpty) {
-      newErrorMessage = "Weigth is not set";
+      newErrorMessage = "Weight is not set";
     } else if (heigthController.text.isEmpty) {
       newErrorMessage = "Height is not set";
     } else if (image == null) {
@@ -133,6 +133,7 @@ class _AdminUserAddState extends ConsumerState<AdminUserAdd> {
           endDate: packageEndDate);
 
       User newUser = User(
+          id: isAddUser ? null : userId,
           joinOn: DateTime.now(),
           lastVisit: DateTime.now(),
           role: role,
@@ -154,12 +155,14 @@ class _AdminUserAddState extends ConsumerState<AdminUserAdd> {
 
       final gymId = ref.read(gymProvider)!.id;
       final response = await UserService().updateUserData(gymId, newUser);
+      if (!isAddUser && isPresentToday) {
+        UserService().markAttendance(userId);
+      }
       // print(response.body);
       if (response.statusCode == 200) {
         User newuser = User.fromJson(response.body);
-        final responseImg =
-            await UserService().uploadProfileImg(newuser.id!, image!);
-        print(responseImg.statusCode);
+
+        await UserService().uploadProfileImg(newuser.id!, image!);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Navigator.of(context).pop();
         });
@@ -206,9 +209,20 @@ class _AdminUserAddState extends ConsumerState<AdminUserAdd> {
           selectedWorkoutList = user.workoutList ?? [];
           diet = user.diet;
           goal = user.goal;
+          userId = user.id!;
         });
       }
       initialize = false;
+      UserService().checkTodaysAttendance(userId).then((value) {
+        if (value.statusCode == 200) {
+          final res = (json.decode(value.body) as Map<String, dynamic>);
+          if (res.isNotEmpty) {
+            isPresentToday = true;
+          } else {
+            isPresentToday = false;
+          }
+        }
+      });
     }
 
     final gymState = ref.watch(gymProvider);
@@ -258,600 +272,631 @@ class _AdminUserAddState extends ConsumerState<AdminUserAdd> {
                   SizedBox(
                     height: height * 0.03,
                   ),
-                  Container(
-                    // width: width * 0.85,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 16),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Container(
-                              // decoration: BoxDecoration(
-                              //     borderRadius: BorderRadius.circular(20)),
-                              // color: Pallete.commonBlueColor,
-                              // padding: EdgeInsets.all(value),
-                              margin: EdgeInsets.all(8),
-                              height: width * 0.3,
-                              width: width * 0.3,
-                              child: image != null
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: Image.file(
-                                        image!,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    )
-                                  : profileImg != null
-                                      ? Image.network(
-                                          profileImg!,
-                                          fit: BoxFit.contain,
-                                        )
-                                      : const Icon(
-                                          Icons.person,
+                  if (gymPackageList.isEmpty)
+                    Container(
+                      // width: width * 0.85,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 16),
+                      child: "Please Add Package".text.makeCentered(),
+                    ),
+                  if (gymDietList.isEmpty)
+                    Container(
+                      // width: width * 0.85,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 16),
+                      child: "Please Add Diet".text.makeCentered(),
+                    ),
+                  if (gymWorkoutList.isEmpty)
+                    Container(
+                      // width: width * 0.85,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 16),
+                      child: "Please Add Workout".text.makeCentered(),
+                    ),
+                  if (gymPackageList.isNotEmpty ||
+                      gymWorkoutList.isNotEmpty ||
+                      gymDietList.isNotEmpty)
+                    Container(
+                      // width: width * 0.85,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 16),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Container(
+                                // decoration: BoxDecoration(
+                                //     borderRadius: BorderRadius.circular(20)),
+                                // color: Pallete.commonBlueColor,
+                                // padding: EdgeInsets.all(value),
+                                margin: EdgeInsets.all(8),
+                                height: width * 0.3,
+                                width: width * 0.3,
+                                child: image != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Image.file(
+                                          image!,
+                                          fit: BoxFit.cover,
                                         ),
+                                      )
+                                    : profileImg != null
+                                        ? Image.network(
+                                            Constant.imgUrl + profileImg!,
+                                            fit: BoxFit.contain,
+                                          )
+                                        : const Icon(
+                                            Icons.person,
+                                          ),
+                              ),
+                              Column(
+                                children: [
+                                  ElevatedButton.icon(
+                                      onPressed: () =>
+                                          getImage(ImageSource.camera),
+                                      icon: Icon(Icons.camera_alt_rounded),
+                                      label: "".text.make()),
+                                  ElevatedButton.icon(
+                                      onPressed: () =>
+                                          getImage(ImageSource.gallery),
+                                      icon: Icon(Icons.photo_library),
+                                      label: "".text.make()),
+                                ],
+                              )
+                            ],
+                          )
+                              .box
+                              .border(color: Pallete.whiteDarkColor)
+                              .color(Pallete.surfaceColor2)
+                              .rounded
+                              .padding(EdgeInsets.only(left: 8))
+                              .make(),
+                          if (!isAddUser) ...[
+                            SizedBox(
+                              height: height * 0.01,
                             ),
-                            Column(
-                              children: [
-                                ElevatedButton.icon(
-                                    onPressed: () =>
-                                        getImage(ImageSource.camera),
-                                    icon: Icon(Icons.camera_alt_rounded),
-                                    label: "".text.make()),
-                                ElevatedButton.icon(
-                                    onPressed: () =>
-                                        getImage(ImageSource.gallery),
-                                    icon: Icon(Icons.photo_library),
-                                    label: "".text.make()),
-                              ],
-                            )
-                          ],
-                        )
-                            .box
-                            .border(color: Pallete.whiteDarkColor)
-                            .color(Pallete.surfaceColor2)
-                            .rounded
-                            .padding(EdgeInsets.only(left: 8))
-                            .make(),
-                        if (!isAddUser) ...[
-                          SizedBox(
-                            height: height * 0.01,
-                          ),
-                          Container(
-                            padding:
-                                EdgeInsets.symmetric(vertical: height * 0.01),
-                            // width: width * 0.85,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    "Last visit"
-                                        .text
-                                        .size(16)
-                                        .color(Pallete.primaryColor)
-                                        .make(),
-                                    SizedBox(
-                                      // width: width * 0.1,
-                                      height: height * 0.005,
-                                    ),
-                                    "${lastVisit.day.toString()} / ${lastVisit.month.toString()} / ${lastVisit.year.toString()}"
-                                        .text
-                                        .make(),
-                                  ],
-                                ),
-                                Column(
-                                  children: [
-                                    "Joined on"
-                                        .text
-                                        .color(Pallete.primaryColor)
-                                        .size(16)
-                                        .make(),
-                                    SizedBox(
-                                      // width: width * 0.1,
-                                      height: height * 0.005,
-                                    ),
-                                    "${joinedOn.day.toString()} / ${joinedOn.month.toString()} / ${joinedOn.year.toString()}"
-                                        .text
-                                        .make(),
-                                  ],
-                                ),
+                            Container(
+                              padding:
+                                  EdgeInsets.symmetric(vertical: height * 0.01),
+                              // width: width * 0.85,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      "Last visit"
+                                          .text
+                                          .size(16)
+                                          .color(Pallete.primaryColor)
+                                          .make(),
+                                      SizedBox(
+                                        // width: width * 0.1,
+                                        height: height * 0.005,
+                                      ),
+                                      "${lastVisit.day.toString()} / ${lastVisit.month.toString()} / ${lastVisit.year.toString()}"
+                                          .text
+                                          .make(),
+                                    ],
+                                  ),
+                                  Column(
+                                    children: [
+                                      "Joined on"
+                                          .text
+                                          .color(Pallete.primaryColor)
+                                          .size(16)
+                                          .make(),
+                                      SizedBox(
+                                        // width: width * 0.1,
+                                        height: height * 0.005,
+                                      ),
+                                      "${joinedOn.day.toString()} / ${joinedOn.month.toString()} / ${joinedOn.year.toString()}"
+                                          .text
+                                          .make(),
+                                    ],
+                                  ),
 
-                                // SizedBox(
-                                //   width: width * 0.006,
-                                // ),
-                                // "Joined on".text.size(16).make(),
-                                // SizedBox(
-                                //   width: width * 0.06,
-                                // ),
-                                // "${joinedOn.day.toString()} / ${joinedOn.month.toString()} / ${joinedOn.year.toString()}"
-                                //     .text
-                                //     .make(),
-                              ],
+                                  // SizedBox(
+                                  //   width: width * 0.006,
+                                  // ),
+                                  // "Joined on".text.size(16).make(),
+                                  // SizedBox(
+                                  //   width: width * 0.06,
+                                  // ),
+                                  // "${joinedOn.day.toString()} / ${joinedOn.month.toString()} / ${joinedOn.year.toString()}"
+                                  //     .text
+                                  //     .make(),
+                                ],
+                              ),
+                            )
+                                .box
+                                .color(Pallete.surfaceColor2)
+                                .rounded
+                                .padding(EdgeInsets.only(left: 12))
+                                .make(),
+                            SizedBox(
+                              height: height * 0.01,
                             ),
-                          )
-                              .box
-                              .color(Pallete.surfaceColor2)
-                              .rounded
-                              .padding(EdgeInsets.only(left: 12))
-                              .make(),
+                            SizedBox(
+                              // width: width * 0.85,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  "Present Today".text.size(16).make(),
+                                  Container(
+                                    margin: EdgeInsets.only(right: width * 0.1),
+                                    child: Switch(
+                                        activeColor: Pallete.primaryColor,
+                                        value: isPresentToday,
+                                        onChanged: ((value) {
+                                          setState(() {
+                                            isPresentToday = !isPresentToday;
+                                          });
+                                        })),
+                                  )
+                                ],
+                              ),
+                            )
+                                .box
+                                .color(Pallete.surfaceColor2)
+                                .rounded
+                                .padding(EdgeInsets.only(left: 12))
+                                .make(),
+                          ],
                           SizedBox(
                             height: height * 0.01,
                           ),
-                          SizedBox(
-                            // width: width * 0.85,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                "Present Today".text.size(16).make(),
-                                Container(
-                                  margin: EdgeInsets.only(right: width * 0.1),
-                                  child: Switch(
-                                      activeColor: Pallete.primaryColor,
-                                      value: isPresentToday,
-                                      onChanged: ((value) {
-                                        setState(() {
-                                          isPresentToday = !isPresentToday;
-                                        });
-                                      })),
-                                )
-                              ],
-                            ),
-                          )
-                              .box
-                              .color(Pallete.surfaceColor2)
-                              .rounded
-                              .padding(EdgeInsets.only(left: 12))
-                              .make(),
-                        ],
-                        SizedBox(
-                          height: height * 0.01,
-                        ),
-                        InputTextField(
-                          label: "Name",
-                          controller: nameController,
-                          type: TextInputType.name,
-                          boardRadius: 20,
-                        ),
-                        SizedBox(
-                          height: height * 0.01,
-                        ),
-                        InputTextField(
-                          label: "Phone Number",
-                          controller: phoneController,
-                          type: TextInputType.phone,
-                          boardRadius: 20,
-                        ),
-                        SizedBox(
-                          height: height * 0.01,
-                        ),
-                        if (emailController.text.isNotEmpty) ...[
                           InputTextField(
-                            label: "Email",
-                            controller: emailController,
-                            type: TextInputType.emailAddress,
+                            label: "Name",
+                            controller: nameController,
+                            type: TextInputType.name,
                             boardRadius: 20,
                           ),
                           SizedBox(
                             height: height * 0.01,
+                          ),
+                          InputTextField(
+                            label: "Phone Number",
+                            controller: phoneController,
+                            type: TextInputType.phone,
+                            boardRadius: 20,
+                          ),
+                          SizedBox(
+                            height: height * 0.01,
+                          ),
+                          if (emailController.text.isNotEmpty) ...[
+                            InputTextField(
+                              label: "Email",
+                              controller: emailController,
+                              type: TextInputType.emailAddress,
+                              boardRadius: 20,
+                            ),
+                            SizedBox(
+                              height: height * 0.01,
+                            )
+                          ],
+                          SizedBox(
+                            // width: width * 0.85,
+                            child: Row(
+                              children: [
+                                "Gender".text.size(16).make(),
+                                SizedBox(
+                                  width: width * 0.06,
+                                ),
+                                Radio(
+                                  // title: Text("Male"),
+                                  value: "male",
+                                  groupValue: gender,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      gender = value.toString();
+                                    });
+                                  },
+                                ),
+                                "Male".text.make(),
+                                SizedBox(
+                                  width: width * 0.06,
+                                ),
+                                Radio(
+                                  // title: Text("Female"),
+                                  value: "female",
+                                  groupValue: gender,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      gender = value.toString();
+                                    });
+                                  },
+                                ),
+                                "Female".text.make(),
+                              ],
+                            ),
                           )
-                        ],
-                        SizedBox(
-                          // width: width * 0.85,
-                          child: Row(
+                              .box
+                              .color(Pallete.surfaceColor2)
+                              .rounded
+                              .padding(EdgeInsets.only(left: 12))
+                              .make(),
+                          SizedBox(
+                            height: height * 0.01,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              "Gender".text.size(16).make(),
-                              SizedBox(
-                                width: width * 0.06,
-                              ),
-                              Radio(
-                                // title: Text("Male"),
-                                value: "male",
-                                groupValue: gender,
+                              "Role".text.size(16).make().box.make(),
+                              DropdownButton<Role>(
+                                itemHeight: kMinInteractiveDimension,
+                                style: const TextStyle(
+                                    fontSize: 16, color: Pallete.primaryColor),
+                                value: role,
+                                borderRadius: BorderRadius.circular(24),
+                                items: gymRoleList.map((var value) {
+                                  return DropdownMenuItem<Role>(
+                                    value: (value),
+                                    child:
+                                        Text(value.name.toString().capitalized)
+                                            .box
+                                            .make(),
+                                  );
+                                }).toList(),
                                 onChanged: (value) {
                                   setState(() {
-                                    gender = value.toString();
+                                    // showSaveReminderBtn = true;
+                                    role = value!;
                                   });
                                 },
+                              )
+                                  .box
+                                  .width(width * 0.35)
+                                  .padding(EdgeInsets.only(left: 4, right: 12))
+                                  .makeCentered()
+                            ],
+                          )
+                              .box
+                              .color(Pallete.surfaceColor2)
+                              .rounded
+                              .padding(EdgeInsets.only(left: 12))
+                              .make(),
+                          SizedBox(
+                            height: height * 0.01,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                // margin: EdgeInsets.only(top: 10),
+                                // padding: EdgeInsets.symmetric(horizontal: 12),
+                                width: width * 0.4,
+                                child: InputTextField(
+                                  boardRadius: 20,
+                                  height: 0,
+                                  label: "Weight",
+                                  hint: "eg: (in Kg)",
+                                  type: TextInputType.number,
+                                  controller: weightController,
+                                ),
                               ),
-                              "Male".text.make(),
-                              SizedBox(
-                                width: width * 0.06,
+                              Container(
+                                // margin: EdgeInsets.only(
+                                //   top: 10,
+                                // ),
+                                // padding: EdgeInsets.symmetric(horizontal: 12),
+                                width: width * 0.4,
+                                child: InputTextField(
+                                  boardRadius: 20,
+                                  label: "Height",
+                                  hint: "eg: (in cm)",
+                                  type: TextInputType.number,
+                                  controller: heigthController,
+                                ),
                               ),
-                              Radio(
-                                // title: Text("Female"),
-                                value: "female",
-                                groupValue: gender,
-                                onChanged: (value) {
-                                  setState(() {
-                                    gender = value.toString();
-                                  });
-                                },
-                              ),
-                              "Female".text.make(),
                             ],
                           ),
-                        )
-                            .box
-                            .color(Pallete.surfaceColor2)
-                            .rounded
-                            .padding(EdgeInsets.only(left: 12))
-                            .make(),
-                        SizedBox(
-                          height: height * 0.01,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            "Role".text.size(16).make().box.make(),
-                            DropdownButton<Role>(
-                              itemHeight: kMinInteractiveDimension,
-                              style: const TextStyle(
-                                  fontSize: 16, color: Pallete.primaryColor),
-                              value: role,
-                              borderRadius: BorderRadius.circular(24),
-                              items: gymRoleList.map((var value) {
-                                return DropdownMenuItem<Role>(
-                                  value: (value),
-                                  child: Text(value.name.toString().capitalized)
-                                      .box
-                                      .make(),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  // showSaveReminderBtn = true;
-                                  role = value!;
-                                });
-                              },
-                            )
-                                .box
-                                .width(width * 0.35)
-                                .padding(EdgeInsets.only(left: 4, right: 12))
-                                .makeCentered()
-                          ],
-                        )
-                            .box
-                            .color(Pallete.surfaceColor2)
-                            .rounded
-                            .padding(EdgeInsets.only(left: 12))
-                            .make(),
-                        SizedBox(
-                          height: height * 0.01,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              // margin: EdgeInsets.only(top: 10),
-                              // padding: EdgeInsets.symmetric(horizontal: 12),
-                              width: width * 0.4,
-                              child: InputTextField(
-                                boardRadius: 20,
-                                height: 0,
-                                label: "Weight",
-                                hint: "eg: (in Kg)",
-                                type: TextInputType.number,
-                                controller: weightController,
-                              ),
-                            ),
-                            Container(
-                              // margin: EdgeInsets.only(
-                              //   top: 10,
-                              // ),
-                              // padding: EdgeInsets.symmetric(horizontal: 12),
-                              width: width * 0.4,
-                              child: InputTextField(
-                                boardRadius: 20,
-                                label: "Height",
-                                hint: "eg: (in cm)",
-                                type: TextInputType.number,
-                                controller: heigthController,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: height * 0.01,
-                        ),
-                        Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                              "Date of Birth:".text.size(16).make(),
-                              "${dob.day.toString()} / ${dob.month.toString()} / ${dob.year.toString()}"
-                                  .text
-                                  .color(Pallete.primaryColor)
-                                  .makeCentered()
-                                  .box
-                                  .margin(EdgeInsets.all(6))
-                                  .width(width * 0.35)
-                                  .height(height * 0.06)
-                                  .border(color: Pallete.whiteDarkColor)
-                                  .color(Pallete.surfaceColor)
-                                  .rounded
-                                  .make()
-                                  .onInkTap(
-                                () async {
-                                  DateTime? date = await showDatePicker(
-                                      context: context,
-                                      initialDate: dob,
-                                      firstDate: DateTime(1940),
-                                      lastDate: DateTime.now());
-                                  if (date != null) {
-                                    setState(() {
-                                      dob = date;
-                                    });
-                                  }
-                                  print(
-                                      "${dob.day.toString()}/${dob.month.toString()}/${dob.year.toString()}");
-                                },
-                              ),
-                            ])
-                            .box
-                            .color(Pallete.surfaceColor2)
-                            .rounded
-                            .padding(EdgeInsets.only(left: 8))
-                            .make(),
-                        SizedBox(
-                          height: height * 0.01,
-                        ),
-                        Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                              "Package Started:".text.size(16).make(),
-                              "${packageStarted.day.toString()} / ${packageStarted.month.toString()} / ${packageStarted.year.toString()}"
-                                  .text
-                                  .color(Pallete.primaryColor)
-                                  .makeCentered()
-                                  .box
-                                  .margin(EdgeInsets.all(6))
-                                  .width(width * 0.35)
-                                  .border(color: Pallete.whiteDarkColor)
-                                  .height(height * 0.06)
-                                  .color(Pallete.surfaceColor)
-                                  .rounded
-                                  .make()
-                                  .onInkTap(
-                                () async {
-                                  DateTime? date = await showDatePicker(
-                                      context: context,
-                                      initialDate: packageStarted,
-                                      firstDate: DateTime.now()
-                                          .subtract(Duration(days: 14)),
-                                      lastDate: DateTime.now()
-                                          .add(Duration(days: 14)));
-                                  if (date != null) {
-                                    setState(() {
-                                      packageStarted = date;
-                                    });
-                                  }
-                                  print(
-                                      "${dob.day.toString()}/${dob.month.toString()}/${dob.year.toString()}");
-                                },
-                              ),
-                            ])
-                            .box
-                            .color(Pallete.surfaceColor2)
-                            .rounded
-                            .padding(EdgeInsets.only(left: 8))
-                            .make(),
-                        SizedBox(
-                          height: height * 0.01,
-                        ),
-                        Wrap(
-                          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            "Package"
-                                .text
-                                .size(16)
-                                .make()
-                                .box
-                                .margin(EdgeInsets.only(
-                                  top: 8,
-                                ))
-                                .make(),
-                            DropdownButton<Package>(
-                              itemHeight: kMinInteractiveDimension,
-                              style: const TextStyle(
-                                  fontSize: 16, color: Pallete.primaryColor),
-                              value: package ?? gymPackageList[0],
-                              borderRadius: BorderRadius.circular(24),
-                              items: gymPackageList.map((var value) {
-                                return DropdownMenuItem<Package>(
-                                  value: (value),
-                                  child: Text(value.name.toString().capitalized)
-                                      .box
-                                      .make(),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  // showSaveReminderBtn = true;
-                                  package = value!;
-                                });
-                              },
-                            )
-                                .box
-                                // .width(width * 0.35)
-                                .padding(
-                                    const EdgeInsets.only(left: 4, right: 12))
-                                .makeCentered()
-                          ],
-                        )
-                            .box
-                            .color(Pallete.surfaceColor2)
-                            .rounded
-                            .padding(const EdgeInsets.only(left: 12))
-                            .make(),
-                        SizedBox(
-                          height: height * 0.01,
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(top: 8, bottom: 8),
-                          // color: Pallete.blueColor,
-                          // height: height * 0.06,
-                          width: width * 0.85,
-                          child: MultiSelectDialogField(
-                            initialValue: selectedWorkoutList,
-                            decoration: BoxDecoration(
-                                color: Pallete.surfaceColor,
-                                borderRadius: BorderRadius.circular(16)),
-                            itemsTextStyle:
-                                const TextStyle(color: Pallete.surfaceColor),
-                            selectedItemsTextStyle:
-                                const TextStyle(color: Pallete.surfaceColor),
-                            selectedColor: Pallete.primaryColor,
-                            unselectedColor: Pallete.whiteColor,
-                            listType: MultiSelectListType.CHIP,
-                            // searchable: true,
-                            buttonText: const Text(
-                              "Workouts",
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            title: const Text("Workouts"),
-                            items: gymWorkoutList
-                                .map((e) => MultiSelectItem(e, e.name))
-                                .toList(),
-                            onConfirm: (values) {
-                              print(values);
-                              selectedWorkoutList = values;
-                            },
-                            // chipDisplay: MultiSelectChipDisplay(
-                            //   onTap: (value) {
-                            //     setState(() {
-                            //       selectedWorkoutList.remove(value);
-                            //     });
-                            //   },
-                            // ),
+                          SizedBox(
+                            height: height * 0.01,
                           ),
-                        )
-                            .box
-                            .color(Pallete.surfaceColor2)
-                            .rounded
-                            .padding(const EdgeInsets.only(left: 12, right: 12))
-                            .make(),
-                        SizedBox(
-                          height: height * 0.01,
-                        ),
-                        Wrap(
-                          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            "Diet"
-                                .text
-                                .size(16)
-                                .make()
-                                .box
-                                .margin(EdgeInsets.only(
-                                  top: 8,
-                                ))
-                                .make(),
-                            DropdownButton<Diet>(
-                              itemHeight: kMinInteractiveDimension,
-                              style: const TextStyle(
-                                  fontSize: 16, color: Pallete.primaryColor),
-                              value: diet ?? gymDietList[0],
-                              borderRadius: BorderRadius.circular(24),
-                              items: gymDietList.map((var value) {
-                                return DropdownMenuItem<Diet>(
-                                  value: (value),
-                                  child: Text(value.name.toString().capitalized)
-                                      .text
-                                      .make()
-                                      .box
-                                      .make(),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  // showSaveReminderBtn = true;
-                                  diet = value!;
-                                });
+                          Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                "Date of Birth:".text.size(16).make(),
+                                "${dob.day.toString()} / ${dob.month.toString()} / ${dob.year.toString()}"
+                                    .text
+                                    .color(Pallete.primaryColor)
+                                    .makeCentered()
+                                    .box
+                                    .margin(EdgeInsets.all(6))
+                                    .width(width * 0.35)
+                                    .height(height * 0.06)
+                                    .border(color: Pallete.whiteDarkColor)
+                                    .color(Pallete.surfaceColor)
+                                    .rounded
+                                    .make()
+                                    .onInkTap(
+                                  () async {
+                                    DateTime? date = await showDatePicker(
+                                        context: context,
+                                        initialDate: dob,
+                                        firstDate: DateTime(1940),
+                                        lastDate: DateTime.now());
+                                    if (date != null) {
+                                      setState(() {
+                                        dob = date;
+                                      });
+                                    }
+                                    print(
+                                        "${dob.day.toString()}/${dob.month.toString()}/${dob.year.toString()}");
+                                  },
+                                ),
+                              ])
+                              .box
+                              .color(Pallete.surfaceColor2)
+                              .rounded
+                              .padding(EdgeInsets.only(left: 8))
+                              .make(),
+                          SizedBox(
+                            height: height * 0.01,
+                          ),
+                          Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                "Package Started:".text.size(16).make(),
+                                "${packageStarted.day.toString()} / ${packageStarted.month.toString()} / ${packageStarted.year.toString()}"
+                                    .text
+                                    .color(Pallete.primaryColor)
+                                    .makeCentered()
+                                    .box
+                                    .margin(EdgeInsets.all(6))
+                                    .width(width * 0.35)
+                                    .border(color: Pallete.whiteDarkColor)
+                                    .height(height * 0.06)
+                                    .color(Pallete.surfaceColor)
+                                    .rounded
+                                    .make()
+                                    .onInkTap(
+                                  () async {
+                                    DateTime? date = await showDatePicker(
+                                        context: context,
+                                        initialDate: packageStarted,
+                                        firstDate: DateTime.now()
+                                            .subtract(Duration(days: 14)),
+                                        lastDate: DateTime.now()
+                                            .add(Duration(days: 14)));
+                                    if (date != null) {
+                                      setState(() {
+                                        packageStarted = date;
+                                      });
+                                    }
+                                    print(
+                                        "${dob.day.toString()}/${dob.month.toString()}/${dob.year.toString()}");
+                                  },
+                                ),
+                              ])
+                              .box
+                              .color(Pallete.surfaceColor2)
+                              .rounded
+                              .padding(EdgeInsets.only(left: 8))
+                              .make(),
+                          SizedBox(
+                            height: height * 0.01,
+                          ),
+                          Wrap(
+                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              "Package"
+                                  .text
+                                  .size(16)
+                                  .make()
+                                  .box
+                                  .margin(EdgeInsets.only(
+                                    top: 8,
+                                  ))
+                                  .make(),
+                              DropdownButton<Package>(
+                                itemHeight: kMinInteractiveDimension,
+                                style: const TextStyle(
+                                    fontSize: 16, color: Pallete.primaryColor),
+                                value: package ?? gymPackageList[0],
+                                borderRadius: BorderRadius.circular(24),
+                                items: gymPackageList.map((var value) {
+                                  return DropdownMenuItem<Package>(
+                                    value: (value),
+                                    child:
+                                        Text(value.name.toString().capitalized)
+                                            .box
+                                            .make(),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    // showSaveReminderBtn = true;
+                                    package = value!;
+                                  });
+                                },
+                              )
+                                  .box
+                                  // .width(width * 0.35)
+                                  .padding(
+                                      const EdgeInsets.only(left: 4, right: 12))
+                                  .makeCentered()
+                            ],
+                          )
+                              .box
+                              .color(Pallete.surfaceColor2)
+                              .rounded
+                              .padding(const EdgeInsets.only(left: 12))
+                              .make(),
+                          SizedBox(
+                            height: height * 0.01,
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(top: 8, bottom: 8),
+                            // color: Pallete.blueColor,
+                            // height: height * 0.06,
+                            width: width * 0.85,
+                            child: MultiSelectDialogField(
+                              initialValue: selectedWorkoutList,
+                              decoration: BoxDecoration(
+                                  color: Pallete.surfaceColor,
+                                  borderRadius: BorderRadius.circular(16)),
+                              itemsTextStyle:
+                                  const TextStyle(color: Pallete.surfaceColor),
+                              selectedItemsTextStyle:
+                                  const TextStyle(color: Pallete.surfaceColor),
+                              selectedColor: Pallete.primaryColor,
+                              unselectedColor: Pallete.whiteColor,
+                              listType: MultiSelectListType.CHIP,
+                              // searchable: true,
+                              buttonText: const Text(
+                                "Workouts",
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              title: const Text("Workouts"),
+                              items: gymWorkoutList
+                                  .map((e) => MultiSelectItem(e, e.name))
+                                  .toList(),
+                              onConfirm: (values) {
+                                print(values);
+                                selectedWorkoutList = values;
                               },
-                            )
-                                .box
-                                // .width(width * 0.35)
-                                .padding(
-                                    const EdgeInsets.only(left: 4, right: 12))
-                                .makeCentered()
-                          ],
-                        )
-                            .box
-                            .color(Pallete.surfaceColor2)
-                            .rounded
-                            .padding(const EdgeInsets.only(left: 12))
-                            .make(),
-                        SizedBox(
-                          height: height * 0.01,
-                        ),
-                        Wrap(
-                          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            "Goal"
-                                .text
-                                .size(16)
-                                .make()
-                                .box
-                                .margin(EdgeInsets.only(
-                                  top: 8,
-                                ))
-                                .make(),
-                            DropdownButton<String>(
-                              itemHeight: kMinInteractiveDimension,
-                              style: const TextStyle(
-                                  fontSize: 16, color: Pallete.primaryColor),
-                              value: goal ?? gymGoalList[0],
-                              borderRadius: BorderRadius.circular(24),
-                              items: gymGoalList.map((var value) {
-                                return DropdownMenuItem<String>(
-                                  value: (value),
-                                  child: Text(value.capitalized)
-                                      .text
-                                      .make()
-                                      .box
-                                      .make(),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  // showSaveReminderBtn = true;
-                                  goal = value!;
-                                });
-                              },
-                            )
-                                .box
-                                // .width(width * 0.35)
-                                .padding(
-                                    const EdgeInsets.only(left: 4, right: 12))
-                                .makeCentered()
-                          ],
-                        )
-                            .box
-                            .color(Pallete.surfaceColor2)
-                            .rounded
-                            .padding(const EdgeInsets.only(left: 12))
-                            .make(),
-                        if (error != "")
-                          "${error}".text.color(Pallete.primaryColor).make(),
-                        ("Save"
-                            .text
-                            .color(Pallete.surfaceColor)
-                            .makeCentered()
-                            .box
-                            .rounded
-                            .color(Pallete.primaryColor)
-                            .width(width * 0.4)
-                            .margin(EdgeInsets.only(top: height * 0.015))
-                            .height(height * 0.06)
-                            .border(color: Pallete.primaryColor)
-                            .makeCentered()
-                            .onInkTap(() {
-                          _onTapSave();
-                        }))
-                      ],
+                              // chipDisplay: MultiSelectChipDisplay(
+                              //   onTap: (value) {
+                              //     setState(() {
+                              //       selectedWorkoutList.remove(value);
+                              //     });
+                              //   },
+                              // ),
+                            ),
+                          )
+                              .box
+                              .color(Pallete.surfaceColor2)
+                              .rounded
+                              .padding(
+                                  const EdgeInsets.only(left: 12, right: 12))
+                              .make(),
+                          SizedBox(
+                            height: height * 0.01,
+                          ),
+                          Wrap(
+                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              "Diet"
+                                  .text
+                                  .size(16)
+                                  .make()
+                                  .box
+                                  .margin(EdgeInsets.only(
+                                    top: 8,
+                                  ))
+                                  .make(),
+                              DropdownButton<Diet>(
+                                itemHeight: kMinInteractiveDimension,
+                                style: const TextStyle(
+                                    fontSize: 16, color: Pallete.primaryColor),
+                                value: diet ?? gymDietList[0],
+                                borderRadius: BorderRadius.circular(24),
+                                items: gymDietList.map((var value) {
+                                  return DropdownMenuItem<Diet>(
+                                    value: (value),
+                                    child:
+                                        Text(value.name.toString().capitalized)
+                                            .text
+                                            .make()
+                                            .box
+                                            .make(),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    // showSaveReminderBtn = true;
+                                    diet = value!;
+                                  });
+                                },
+                              )
+                                  .box
+                                  // .width(width * 0.35)
+                                  .padding(
+                                      const EdgeInsets.only(left: 4, right: 12))
+                                  .makeCentered()
+                            ],
+                          )
+                              .box
+                              .color(Pallete.surfaceColor2)
+                              .rounded
+                              .padding(const EdgeInsets.only(left: 12))
+                              .make(),
+                          SizedBox(
+                            height: height * 0.01,
+                          ),
+                          Wrap(
+                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              "Goal"
+                                  .text
+                                  .size(16)
+                                  .make()
+                                  .box
+                                  .margin(EdgeInsets.only(
+                                    top: 8,
+                                  ))
+                                  .make(),
+                              DropdownButton<String>(
+                                itemHeight: kMinInteractiveDimension,
+                                style: const TextStyle(
+                                    fontSize: 16, color: Pallete.primaryColor),
+                                value: goal ?? gymGoalList[0],
+                                borderRadius: BorderRadius.circular(24),
+                                items: gymGoalList.map((var value) {
+                                  return DropdownMenuItem<String>(
+                                    value: (value),
+                                    child: Text(value.capitalized)
+                                        .text
+                                        .make()
+                                        .box
+                                        .make(),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    // showSaveReminderBtn = true;
+                                    goal = value!;
+                                  });
+                                },
+                              )
+                                  .box
+                                  // .width(width * 0.35)
+                                  .padding(
+                                      const EdgeInsets.only(left: 4, right: 12))
+                                  .makeCentered()
+                            ],
+                          )
+                              .box
+                              .color(Pallete.surfaceColor2)
+                              .rounded
+                              .padding(const EdgeInsets.only(left: 12))
+                              .make(),
+                          if (error != "")
+                            "${error}".text.color(Pallete.primaryColor).make(),
+                          ("Save"
+                              .text
+                              .color(Pallete.surfaceColor)
+                              .makeCentered()
+                              .box
+                              .rounded
+                              .color(Pallete.primaryColor)
+                              .width(width * 0.4)
+                              .margin(EdgeInsets.only(top: height * 0.015))
+                              .height(height * 0.06)
+                              .border(color: Pallete.primaryColor)
+                              .makeCentered()
+                              .onInkTap(() {
+                            _onTapSave();
+                          }))
+                        ],
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),

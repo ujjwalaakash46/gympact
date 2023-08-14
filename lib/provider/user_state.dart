@@ -51,6 +51,10 @@ class UserNotifier extends StateNotifier<User?> {
   }
 
   User? get() => state;
+
+  logout() {
+    state = null;
+  }
 }
 
 final homeMessageProvider =
@@ -82,11 +86,8 @@ class TodaysProgressNotifier extends StateNotifier<List<Progress>?> {
   TodaysProgressNotifier() : super(null);
 
   Future<List<Progress>?> fetchProgress(int userId) async {
-    print(44);
     final response = await UserService().getTodaysProgress(userId);
     if (response.statusCode == 200) {
-      print(222);
-      print(response.body);
       final res = List<Progress>.from(
           (json.decode(response.body) as List<dynamic>)
               .map((e) => Progress.fromMap(e as Map<String, dynamic>))
@@ -133,6 +134,7 @@ class NotificationNotifier extends StateNotifier<List<Message>> {
           (json.decode(response.body) as List<dynamic>)
               .map((e) => Message.fromMap(e)));
       state = res;
+      print(res);
       return state;
     }
     return {};
